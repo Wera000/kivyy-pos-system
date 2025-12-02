@@ -20,30 +20,30 @@ jobs:
       with:
         python-version: '3.9'
         
-    # Fix 2: Buildozer Cache Files များကို ရှင်းပစ်ပါ
-    - name: Clean Buildozer Cache Files
-      run: |
-        rm -rf ~/.buildozer
-        rm -rf $HOME/.buildozer
-
-    # Fix 3: System Dependencies
+    # Fix 2: System Dependencies (Aidl 32-bit Dependency ထည့်သွင်းခြင်း)
     - name: Install System Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y git build-essential unzip zlib1g-dev libffi-dev libssl-dev 
+        # Add 32-bit architecture for Aidl compatibility
+        sudo dpkg --add-architecture i386
+        sudo apt-get update
+        sudo apt-get install -y libstdc++6:i386
 
-    # Fix 4: Python Libraries များကို 3.9 Environment တွင် Install လုပ်ပါ
+    # Fix 3: Python Libraries များကို 3.9 Environment တွင် Install လုပ်ပါ
     - name: Install Buildozer and Python Libraries
       run: pip install buildozer cython setuptools==65.5.0
+
+    # Fix 4: Buildozer Command မ run ခင် Cache File များကို ရှင်းပစ်ပါ (Install ပြီးမှ Clean)
+    - name: Clean Buildozer Cache Files
+      run: |
+        rm -rf ~/.buildozer
+        rm -rf $HOME/.buildozer
         
-    # === NEW FIX 1: Config အသစ်ကို ချက်ချင်း ဖတ်စေရန် Manual Update လုပ်ခြင်း ===
-    - name: Force Buildozer Update (Read New Config)
+    # Fix 5: SDK Tools များကို Manual Update လုပ်ခြင်း (License Fix)
+    - name: Force Buildozer Update and Install Tools
       run: buildozer android update
 
-    # === NEW FIX 2: Cython Path ကို စစ်ဆေးရန် (cython not found error ပျောက်ရန်) ===
-    - name: Check Cython Path
-      run: which cython
-      
     - name: Build Android APK
       # Build ကို စတင်ပါ
       run: buildozer android debug --android-ndk 21e
