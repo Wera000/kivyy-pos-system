@@ -9,6 +9,6 @@ source.include_exts = py,kv,png,jpg,atlas,zip,wav,mp3,ogg
 version = 0.1
 orientation = landscape
 fullscreen = 0
-android.api = 31
+android.api = 30
 android.minapi = 21
 android.ndk = 25b
