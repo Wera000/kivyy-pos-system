@@ -14,9 +14,11 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    # Fix 1: System Dependencies (Includes Git, JDK, and 32-bit Libs)
     - name: Install System Dependencies
       run: |
         sudo apt update
+        # Install Core Build Tools (Git, Compiler, Java JDK 17)
         sudo apt install -y \
           git \
           zip \
@@ -28,59 +30,76 @@ jobs:
           libffi-dev \
           libssl-dev
 
+        # Aidl Fix: Install 32-bit library dependency for 64-bit systems
         sudo dpkg --add-architecture i386
         sudo apt update
         sudo apt install -y libstdc++6:i386
 
+        # Verify installation paths
         git --version
         java -version
 
+    # Fix 2: Python 3.9 Environment ကို တပ်ဆင်ခြင်း (Distutils Fix)
     - name: Set up Python 3.9
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
+    # Fix 3: Install Buildozer (Setuptools Version Fix)
     - name: Install Buildozer
       run: |
         pip install --upgrade pip
+        # setuptools==65.5.0 is critical to fix the 'distutils' error on Python 3.9
         pip install buildozer cython setuptools==65.5.0
 
+    # ⭐ Fix 4: FULL ANDROID SDK + NDK INSTALL (Manual Setup for Aidl/License Fix)
     - name: Install Android SDK + NDK (AIDL + LICENSE FIX)
       run: |
+        # 1. Download Command Line Tools
         mkdir -p $HOME/android-sdk
         wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
         unzip commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk
 
+        # 2. Fix the folder structure
         mv $HOME/android-sdk/cmdline-tools $HOME/android-sdk/cmdline-tools-temp
         mkdir -p $HOME/android-sdk/cmdline-tools
         mv $HOME/android-sdk/cmdline-tools-temp $HOME/android-sdk/cmdline-tools/latest
 
+        # 3. Set Environment Variables
         export ANDROID_HOME=$HOME/android-sdk
         export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
 
+        # 4. Clean previous buildozer SDK reference (to force it to use our manual one)
         rm -rf $HOME/.buildozer/android/platform/android-sdk
 
+        # 5. Accept Licenses
         yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses || true
 
+        # 6. Install required packages
         sdkmanager --sdk_root=$ANDROID_HOME \
           "platform-tools" \
           "platforms;android-30" \
           "build-tools;30.0.3" \
-          "ndk;21.4.7075529"
+          "ndk;21.4.7075529" # Specific stable NDK version
 
+        # Verify AIDL is present in the build-tools folder
         ls $ANDROID_HOME/build-tools/30.0.3/aidl
 
+    # Fix 5: Clean Buildozer cache (Crucial before starting build)
     - name: Clean Buildozer Cache
       run: rm -rf ~/.buildozer
 
     - name: Build APK
       env:
+        # Crucial ENV vars for Buildozer
         ANDROID_HOME: $HOME/android-sdk
-        run: |
-          export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools
-          which git
-          git --version
-          buildozer android debug
+        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64 # Set Java Home explicitly
+      run: |
+        export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools
+        which git
+        git --version
+        # Use buildozer without specifying NDK version as it is installed manually
+        buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
