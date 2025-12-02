@@ -25,7 +25,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y git build-essential unzip zlib1g-dev libffi-dev libssl-dev 
-        # Add 32-bit architecture for Aidl compatibility
+        # Aidl 32-bit fix:
         sudo dpkg --add-architecture i386
         sudo apt-get update
         sudo apt-get install -y libstdc++6:i386
@@ -34,15 +34,19 @@ jobs:
     - name: Install Buildozer and Python Libraries
       run: pip install buildozer cython setuptools==65.5.0
 
-    # Fix 4: Buildozer Command မ run ခင် Cache File များကို ရှင်းပစ်ပါ (Install ပြီးမှ Clean)
+    # Fix 4: Buildozer Cache Files များကို ရှင်းပစ်ပါ (Install ပြီးမှ Clean)
     - name: Clean Buildozer Cache Files
       run: |
         rm -rf ~/.buildozer
         rm -rf $HOME/.buildozer
         
-    # Fix 5: SDK Tools များကို Manual Update လုပ်ခြင်း (License Fix)
-    - name: Force Buildozer Update and Install Tools
-      run: buildozer android update
+    # === NEW FIX 5: Aidl Build Tools များကို Manual Force Install လုပ်ခြင်း ===
+    - name: Force SDK Build Tools Install and License Accept
+      run: |
+        # Buildozer ကို manual update လုပ်ခိုင်းပြီး SDK Tools တွေကို Install လုပ်သည်
+        buildozer android update
+        # 30.0.3 Build Tools ကို force install လုပ်ပြီး License ကို လက်ခံသည်
+        yes | sdkmanager "build-tools;30.0.3" --licenses || true
 
     - name: Build Android APK
       # Build ကို စတင်ပါ
