@@ -14,6 +14,13 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    # === NEW STEP: Cache ကို ရှင်းပစ်ခြင်း ===
+    - name: Delete Buildozer Cache
+      run: |
+        rm -rf ~/.buildozer
+        rm -rf $HOME/.buildozer
+    # ========================================
+
     - name: Set up Environment (Install All Dependencies)
       run: |
         sudo apt-get update
@@ -26,7 +33,6 @@ jobs:
       run: pip install buildozer cython setuptools==65.5.0
 
     - name: Clean Buildozer Cache (Crucial Fix)
-      # ယခုမှသာ Buildozer Command ကို ရှာတွေ့ပါမည်။
       run: buildozer android clean 
 
     - name: Build Android APK
