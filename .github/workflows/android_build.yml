@@ -2,7 +2,8 @@ name: Build Kivy Android App
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -10,48 +11,65 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Set up Python 3.9
+    # Fix 1: Python 3.9 Environment ကို တပ်ဆင်ခြင်း 
+    - name: Set up Python 3.9 Environment
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
-    - name: Install Dependencies
+    # Fix 2: System Dependencies (Aidl 32-bit Fix)
+    - name: Install System Dependencies (Aidl Fix)
       run: |
         sudo apt-get update
-        sudo apt-get install -y git unzip zlib1g-dev libffi-dev libssl-dev
+        sudo apt-get install -y git build-essential unzip zlib1g-dev libffi-dev libssl-dev
+        # Aidl tool requires this 32-bit library on 64-bit systems
+        sudo dpkg --add-architecture i386
+        sudo apt-get update
+        sudo apt-get install -y libstdc++6:i386
 
-    - name: Install Buildozer
-      run: pip install buildozer cython
+    # Fix 3: Install Buildozer and Build Dependencies (Distutils Fix)
+    - name: Install Buildozer and Dependencies
+      # setuptools==65.5.0 is critical to fix the 'distutils' error on Python 3.9
+      run: pip install buildozer cython setuptools==65.5.0
 
-    # ⭐ FULL ANDROID SDK INSTALL (fixes AIDL 100%)
-    - name: Install Android SDK
+    # ⭐ Fix 4: FULL ANDROID SDK INSTALL (Manual Setup for Aidl/License Fix)
+    - name: Manual Install Android SDK and Tools
       run: |
+        # 1. Download Command Line Tools
         mkdir -p $HOME/android-sdk
-        wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
-        unzip commandlinetools-linux-8512546_latest.zip -d $HOME/android-sdk
-        mkdir -p $HOME/android-sdk/cmdline-tools/latest
-        mv $HOME/android-sdk/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/
+        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk
 
+        # 2. Fix the folder structure (Google changes it constantly)
+        mv $HOME/android-sdk/cmdline-tools $HOME/android-sdk/cmdline-tools-temp
+        mkdir -p $HOME/android-sdk/cmdline-tools
+        mv $HOME/android-sdk/cmdline-tools-temp $HOME/android-sdk/cmdline-tools/latest
+
+        # 3. Export PATH and ANDROID_HOME
         export ANDROID_HOME=$HOME/android-sdk
         export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
+        # 4. Accept Licenses and Install Required Tools (Platform 30 & Build Tools 30.0.3)
         yes | sdkmanager --licenses
         sdkmanager "platform-tools"
         sdkmanager "platforms;android-30"
         sdkmanager "build-tools;30.0.3"
+        
+    # Fix 5: Clean Buildozer cache (Crucial before starting build)
+    - name: Clean Buildozer Cache Files
+      run: rm -rf ~/.buildozer
 
-    - name: Clean Buildozer
-      run: rm -rf .buildozer
-
-    - name: Build APK
+    - name: Build Android APK
+      # Explicitly set environment variables for the build step
       env:
         ANDROID_HOME: $HOME/android-sdk
+        # Set the PATH to ensure buildozer finds the manually installed sdkmanager/aidl
         PATH: $HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH
-      run: buildozer android debug
+      # We still need the correct NDK version (21b from spec)
+      run: buildozer android debug --android-ndk 21b
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
