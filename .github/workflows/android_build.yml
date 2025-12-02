@@ -20,7 +20,7 @@ jobs:
       with:
         python-version: '3.9'
         
-    # Fix 2: Buildozer Command မ run ခင် Cache File များကို ရှင်းပစ်ပါ
+    # Fix 2: Buildozer Cache Files များကို ရှင်းပစ်ပါ
     - name: Clean Buildozer Cache Files
       run: |
         rm -rf ~/.buildozer
@@ -35,13 +35,15 @@ jobs:
     # Fix 4: Python Libraries များကို 3.9 Environment တွင် Install လုပ်ပါ
     - name: Install Buildozer and Python Libraries
       run: pip install buildozer cython setuptools==65.5.0
-
-    # === NEW FIX: SDK Tools များကို Manual Force Install လုပ်ခြင်း ===
-    - name: Force SDK Tools Installation
-      run: |
-        # Buildozer ကိုယ်တိုင် SDK ကို Download & Tools များကို Install လုပ်စေရန်
-        buildozer android update
         
+    # === NEW FIX 1: Config အသစ်ကို ချက်ချင်း ဖတ်စေရန် Manual Update လုပ်ခြင်း ===
+    - name: Force Buildozer Update (Read New Config)
+      run: buildozer android update
+
+    # === NEW FIX 2: Cython Path ကို စစ်ဆေးရန် (cython not found error ပျောက်ရန်) ===
+    - name: Check Cython Path
+      run: which cython
+      
     - name: Build Android APK
       # Build ကို စတင်ပါ
       run: buildozer android debug --android-ndk 21e
