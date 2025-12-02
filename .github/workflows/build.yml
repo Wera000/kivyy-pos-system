@@ -76,8 +76,11 @@ jobs:
     - name: Build APK
       env:
         ANDROID_HOME: $HOME/android-sdk
-        PATH: $HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH
-      run: buildozer android debug
+        run: |
+          export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools
+          which git
+          git --version
+          buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
