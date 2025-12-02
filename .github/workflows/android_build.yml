@@ -17,16 +17,17 @@ jobs:
     - name: Set up Environment (Install All Dependencies)
       run: |
         sudo apt-get update
-        # Install dependencies: Use separate commands for better error handling
+        # Install dependencies and distutils fixes
         sudo apt-get install -y python3-pip git build-essential unzip zlib1g-dev python3-distutils libffi-dev libssl-dev libncurses-dev || true
-        # Install additional packages for new Ubuntu versions
         sudo apt-get install -y libpython3.12-stdlib python3.12-distutils libncursesw6 || true
-
-    - name: Clean Buildozer Cache (Crucial Fix)
-      run: buildozer android clean
+        sudo apt-get install -y libncurses-dev 
 
     - name: Install Buildozer and Build Dependencies
       run: pip install buildozer cython setuptools==65.5.0
+
+    - name: Clean Buildozer Cache (Crucial Fix)
+      # BUILDDER ကို INSTALL လုပ်ပြီးမှ CLEAN လုပ်ရပါမယ်!
+      run: buildozer android clean 
 
     - name: Build Android APK
       # Use custom NDK 21e to avoid path/toolchain errors with newer NDKs
