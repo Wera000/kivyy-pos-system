@@ -1,5 +1,5 @@
 [app]
-title = My Kivy 8-Screen App
+title = My Kivy B-Screen App
 package.name = myapp
 package.domain = org.myapp.github
 source.dir = .
@@ -11,4 +11,9 @@ orientation = landscape
 fullscreen = 0
 android.api = 30
 android.minapi = 21
-android.ndk = 25b
+android.ndk = 21b
+android.accept_licenses = True
+
+[buildozer]
+log_level = 2
+warn_on_error = 0
