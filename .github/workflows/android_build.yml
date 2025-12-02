@@ -36,14 +36,15 @@ jobs:
     - name: Install Buildozer and Python Libraries
       run: pip install buildozer cython setuptools==65.5.0
         
-    # Fix 5: SDK License ကို လက်ခံခြင်း (AIDL/Build Tools Error ပျောက်ရန်)
-    - name: Accept SDK Licenses
+    - name: Build Android APK (Toolchain Download စတင်သည်)
+      # Fix 5: NDK 21e နှင့် Build ကို စတင်ပါ (Buildozer Toolchain Download လုပ်ပါလိမ့်မည်)
+      run: buildozer android debug --android-ndk 21e
+
+    # Fix 6: Build Fail ဖြစ်ခဲ့ရင်တောင် License ကို အလိုအလျောက် လက်ခံဖို့ နောက်ဆုံးကြိုးစားခြင်း
+    - name: Accept SDK Licenses (Final Attempt)
+      if: failure() || success()
       run: |
         yes | sdkmanager --licenses || echo "License acceptance failed, continuing anyway"
-
-    - name: Build Android APK (Toolchain Download စတင်သည်)
-      # Build ကို စတင်ပါ
-      run: buildozer android debug --android-ndk 21e
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
