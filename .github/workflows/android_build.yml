@@ -14,23 +14,23 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # Fix 1: Python 3.9 Environment ကို တပ်ဆင်ခြင်း 
+    # Fix 1: Python 3.9 Environment ကို တပ်ဆင်ခြင်း (Distutils Fix)
     - name: Set up Python 3.9 Environment
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
-    # Fix 2: System Dependencies (Aidl 32-bit Fix)
+    # Fix 2: System Dependencies (Aidl 32-bit Dependency Fix)
     - name: Install System Dependencies (Aidl Fix)
       run: |
         sudo apt-get update
-        sudo apt-get install -y git build-essential unzip zlib1g-dev libffi-dev libssl-dev
+        sudo apt-get install -y git build-essential unzip zlib1g-dev libffi-dev libssl-dev 
         # Aidl tool requires this 32-bit library on 64-bit systems
         sudo dpkg --add-architecture i386
         sudo apt-get update
         sudo apt-get install -y libstdc++6:i386
 
-    # Fix 3: Install Buildozer and Build Dependencies (Distutils Fix)
+    # Fix 3: Install Buildozer and Build Dependencies (Setuptools Version Fix)
     - name: Install Buildozer and Dependencies
       # setuptools==65.5.0 is critical to fix the 'distutils' error on Python 3.9
       run: pip install buildozer cython setuptools==65.5.0
@@ -68,7 +68,7 @@ jobs:
         ANDROID_HOME: $HOME/android-sdk
         # Set the PATH to ensure buildozer finds the manually installed sdkmanager/aidl
         PATH: $HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH
-      # We still need the correct NDK version (21b from spec)
+      # NDK 21b is used as it is the most stable version and should match buildozer.spec
       run: buildozer android debug --android-ndk 21b
 
     - name: Upload APK
