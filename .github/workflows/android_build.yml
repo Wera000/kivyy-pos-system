@@ -20,7 +20,7 @@ jobs:
       with:
         python-version: '3.9'
         
-    # Fix 2: Buildozer Cache Files များကို ရှင်းပစ်ပါ
+    # Fix 2: Buildozer Command မ run ခင် Cache File များကို ရှင်းပစ်ပါ
     - name: Clean Buildozer Cache Files
       run: |
         rm -rf ~/.buildozer
@@ -35,9 +35,15 @@ jobs:
     # Fix 4: Python Libraries များကို 3.9 Environment တွင် Install လုပ်ပါ
     - name: Install Buildozer and Python Libraries
       run: pip install buildozer cython setuptools==65.5.0
+
+    # === NEW FIX: SDK Tools များကို Manual Force Install လုပ်ခြင်း ===
+    - name: Force SDK Tools Installation
+      run: |
+        # Buildozer ကိုယ်တိုင် SDK ကို Download & Tools များကို Install လုပ်စေရန်
+        buildozer android update
         
     - name: Build Android APK
-      # Fix 5: Buildozer Spec ထဲမှာ License ကို True လုပ်ထားပြီးဖြစ်သဖြင့် Build ကို တိုက်ရိုက် run ပါ
+      # Build ကို စတင်ပါ
       run: buildozer android debug --android-ndk 21e
 
     - name: Upload APK
