@@ -26,11 +26,11 @@ jobs:
       run: pip install buildozer cython setuptools==65.5.0
 
     - name: Clean Buildozer Cache (Crucial Fix)
-      # BUILDDER ကို INSTALL လုပ်ပြီးမှ CLEAN လုပ်ရပါမယ်!
+      # ယခုမှသာ Buildozer Command ကို ရှာတွေ့ပါမည်။
       run: buildozer android clean 
 
     - name: Build Android APK
-      # Use custom NDK 21e to avoid path/toolchain errors with newer NDKs
+      # NDK 21e ကို သုံးပြီး Build ကို စတင်ပါ
       run: buildozer android debug --android-ndk 21e
 
     - name: Upload APK
