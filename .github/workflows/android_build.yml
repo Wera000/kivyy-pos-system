@@ -1,0 +1,32 @@
+name: Build Kivy Android App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Environment (Install Dependencies)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pip git build-essential unzip zlib1g-dev
+
+    - name: Install Buildozer
+      run: pip install buildozer
+
+    - name: Build Android APK
+      run: buildozer android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: Kivy-Android-App
+        path: bin/*.apk
