@@ -14,29 +14,28 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # === NEW STEP: Cache ကို ရှင်းပစ်ခြင်း ===
+    # Fix 1: Cache အဟောင်းကို ရှင်းပစ်ခြင်း (Distutils Error ပျောက်ကင်းစေရန်)
     - name: Delete Buildozer Cache
       run: |
         rm -rf ~/.buildozer
         rm -rf $HOME/.buildozer
-    # ========================================
 
     - name: Set up Environment (Install All Dependencies)
       run: |
         sudo apt-get update
-        # Install dependencies and distutils fixes
-        sudo apt-get install -y python3-pip git build-essential unzip zlib1g-dev python3-distutils libffi-dev libssl-dev libncurses-dev || true
+        # Fix 2: Ubuntu Dependencies Install
+        sudo apt-get install -y python3-pip git build-essential unzip zlib1g-dev libffi-dev libssl-dev libncurses-dev python3-distutils || true
         sudo apt-get install -y libpython3.12-stdlib python3.12-distutils libncursesw6 || true
-        sudo apt-get install -y libncurses-dev 
-
-    - name: Install Buildozer and Build Dependencies
+        
+    - name: Install Buildozer and Build Dependencies (Python Libraries)
       run: pip install buildozer cython setuptools==65.5.0
 
-    - name: Clean Buildozer Cache (Crucial Fix)
+    - name: Clean Buildozer Cache (Buildozer Command Run)
+      # Fix 3: Buildozer Command ကို Install ပြီးမှ Run ပါ
       run: buildozer android clean 
 
     - name: Build Android APK
-      # NDK 21e ကို သုံးပြီး Build ကို စတင်ပါ
+      # Fix 4: NDK 21e နှင့် Python 3.9 ကို buildozer.spec မှ သုံးပြီး Build ကို စတင်ပါ
       run: buildozer android debug --android-ndk 21e
 
     - name: Upload APK
