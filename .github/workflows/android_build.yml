@@ -24,22 +24,26 @@ jobs:
     - name: Install Buildozer and Python Libraries
       run: pip install buildozer cython setuptools==65.5.0
 
-    # Clean Cache/Toolchain (Installation ပြီးမှ Clean လုပ်ခြင်း)
-    - name: Clean Buildozer Cache & Toolchain
+    # Clean Cache Only (Buildozer Toolchain မဟုတ်သေးပါ)
+    - name: Clean Buildozer Cache Files
       run: |
         rm -rf ~/.buildozer
         rm -rf $HOME/.buildozer
-        buildozer android clean
-        
+
     - name: Install System Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y git build-essential unzip zlib1g-dev libffi-dev libssl-dev 
         
-    - name: Build Android APK
-      # NDK 21e နှင့် 3.9 (spec ထဲမှ) ကို သုံးပြီး Build ကို စတင်ပါ
+    - name: Build Android APK (Toolchain Download စတင်သည်)
+      # Fix: Clean ကို ဖြုတ်ပြီး NDK 21e နှင့် Build ကို စတင်ပါ
       run: buildozer android debug --android-ndk 21e
 
+    - name: Clean Toolchain (Optional: ပြီးမှ Clean လုပ်ရန်)
+      # Build ပြီးမှ Clean လုပ်ရန် (အကယ်၍ လိုအပ်ပါက)
+      if: always()
+      run: buildozer android clean
+        
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
