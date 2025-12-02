@@ -1,0 +1,34 @@
+name: Build Kivy Android App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Install Git (FORCE)
+      run: |
+        sudo apt update
+        sudo apt install -y git
+        git --version
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.9"
+
+    - name: Install Buildozer
+      run: |
+        pip install --upgrade pip
+        pip install buildozer cython setuptools==65.5.0
+
+    - name: Build APK (TEST ONLY)
+      run: buildozer android debug
