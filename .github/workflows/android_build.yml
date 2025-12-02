@@ -14,68 +14,71 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # Fix 1: Python 3.9 Environment ကို တပ်ဆင်ခြင်း (Distutils Fix)
-    - name: Set up Python 3.9 Environment
+    # ✅ Python 3.9 (Buildozer Stable)
+    - name: Set up Python 3.9
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
-    # Fix 2: System Dependencies (Aidl 32-bit Dependency Fix + Build Tools)
-    - name: Install System Dependencies (Aidl Fix)
+    # ✅ REQUIRED SYSTEM DEPENDENCIES (GIT + JAVA + BUILD TOOLS)
+    - name: Install System Dependencies
       run: |
-        sudo apt-get update
-        # CRITICAL FIX: Ensure GIT and build-essential are available for Toolchain building.
-        sudo apt-get install -y git build-essential unzip
-        
-        # Install remaining system dependencies
-        sudo apt-get install -y zlib1g-dev libffi-dev libssl-dev 
-        
-        # Aidl tool requires this 32-bit library on 64-bit systems
+        sudo apt update
+        sudo apt install -y \
+          git \
+          zip \
+          unzip \
+          wget \
+          openjdk-17-jdk \
+          build-essential \
+          zlib1g-dev \
+          libffi-dev \
+          libssl-dev
+
         sudo dpkg --add-architecture i386
-        sudo apt-get update
-        sudo apt-get install -y libstdc++6:i386
+        sudo apt update
+        sudo apt install -y libstdc++6:i386
 
-    # Fix 3: Install Buildozer and Build Dependencies (Setuptools Version Fix)
-    - name: Install Buildozer and Dependencies
-      # setuptools==65.5.0 is critical to fix the 'distutils' error on Python 3.9
-      run: pip install buildozer cython setuptools==65.5.0
-
-    # ⭐ Fix 4: FULL ANDROID SDK INSTALL (Manual Setup for Aidl/License Fix)
-    - name: Manual Install Android SDK and Tools
+    # ✅ Buildozer + Distutils Fix
+    - name: Install Buildozer
       run: |
-        # 1. Download Command Line Tools
+        pip install --upgrade pip
+        pip install buildozer cython setuptools==65.5.0
+
+    # ✅ ANDROID SDK + NDK 21B INSTALLED PROPERLY
+    - name: Install Android SDK & NDK
+      run: |
         mkdir -p $HOME/android-sdk
         wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
         unzip commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk
 
-        # 2. Fix the folder structure (Google changes it constantly)
         mv $HOME/android-sdk/cmdline-tools $HOME/android-sdk/cmdline-tools-temp
         mkdir -p $HOME/android-sdk/cmdline-tools
         mv $HOME/android-sdk/cmdline-tools-temp $HOME/android-sdk/cmdline-tools/latest
 
-        # 3. Export PATH and ANDROID_HOME
         export ANDROID_HOME=$HOME/android-sdk
-        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+        export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
 
-        # 4. Accept Licenses and Install Required Tools (Platform 30 & Build Tools 30.0.3)
         yes | sdkmanager --licenses
-        sdkmanager "platform-tools"
-        sdkmanager "platforms;android-30"
-        sdkmanager "build-tools;30.0.3"
-        
-    # Fix 5: Clean Buildozer cache (Crucial before starting build)
-    - name: Clean Buildozer Cache Files
+
+        sdkmanager \
+          "platform-tools" \
+          "platforms;android-30" \
+          "build-tools;30.0.3" \
+          "ndk;21.4.7075529"
+
+    # ✅ CLEAN CACHE
+    - name: Clean Buildozer Cache
       run: rm -rf ~/.buildozer
 
-    - name: Build Android APK
-      # Explicitly set environment variables for the build step
+    # ✅ REAL APK BUILD (NO NDK ARGUMENT NEEDED)
+    - name: Build APK
       env:
         ANDROID_HOME: $HOME/android-sdk
-        # Set the PATH to ensure buildozer finds the manually installed sdkmanager/aidl
         PATH: $HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH
-      # NDK 21b is used as it is the most stable version and should match buildozer.spec
-      run: buildozer android debug --android-ndk 21b
+      run: buildozer android debug
 
+    # ✅ UPLOAD APK
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
