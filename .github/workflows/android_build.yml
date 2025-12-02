@@ -14,19 +14,19 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # === Fix 1: Python 3.9 Environment ကို တပ်ဆင်ခြင်း (Distutils Error ပျောက်ရန်) ===
+    # Fix 1: Python 3.9 Environment ကို တပ်ဆင်ခြင်း (Distutils Error ပျောက်ရန်)
     - name: Set up Python 3.9 Environment
       uses: actions/setup-python@v5
       with:
         python-version: '3.9'
         
-    # Fix 2: Buildozer Command ကို Run မလုပ်ခင် Cache File များကိုသာ ရှင်းပစ်ပါ
+    # Fix 2: Buildozer Command မ run ခင် Cache File များကို ရှင်းပစ်ပါ
     - name: Clean Buildozer Cache Files
       run: |
         rm -rf ~/.buildozer
         rm -rf $HOME/.buildozer
 
-    # Fix 3: System Dependencies (AIDL/Build Tools အတွက်)
+    # Fix 3: System Dependencies
     - name: Install System Dependencies
       run: |
         sudo apt-get update
@@ -42,7 +42,7 @@ jobs:
         yes | sdkmanager --licenses || echo "License acceptance failed, continuing anyway"
 
     - name: Build Android APK (Toolchain Download စတင်သည်)
-      # NDK 21e နှင့် Build ကို စတင်ပါ (Buildozer Toolchain Download လုပ်ပါလိမ့်မည်)
+      # Build ကို စတင်ပါ
       run: buildozer android debug --android-ndk 21e
 
     - name: Upload APK
