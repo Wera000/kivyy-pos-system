@@ -19,8 +19,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y python3-pip git build-essential unzip zlib1g-dev
 
-    - name: Install Buildozer
-      run: pip install buildozer
+    - name: Install Buildozer and Build Dependencies
+      run: pip install buildozer cython setuptools==65.5.0
 
     - name: Build Android APK
       run: buildozer android debug
