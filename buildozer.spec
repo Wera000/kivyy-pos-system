@@ -18,7 +18,6 @@ android.minapi = 21
 android.ndk = 21b
 android.accept_licenses = True
 
-# ✅ This prevents AIDL crashes
 p4a.broken_recipes = aidl
 
 [buildozer]
