@@ -14,15 +14,17 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Set up Environment (Install Dependencies)
+    - name: Set up Environment (Install All Dependencies)
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-pip git build-essential unzip zlib1g-dev
+        # Base dependencies + Fix for 'distutils' and NDK issues
+        sudo apt-get install -y python3-pip git build-essential unzip zlib1g-dev python3-distutils libncursesw5 libffi-dev libssl-dev
 
     - name: Install Buildozer and Build Dependencies
       run: pip install buildozer cython setuptools==65.5.0
 
     - name: Build Android APK
+      # Use verbose mode (-v) for better debugging if needed, but run the debug build
       run: buildozer android debug
 
     - name: Upload APK
