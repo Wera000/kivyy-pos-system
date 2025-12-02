@@ -1,0 +1,1889 @@
+# Define styles for the CustomButton (used on MainScreen)
+<CustomButton@Button>:
+    # Styling to match the screenshot (light background, blue border)
+    background_normal: ''
+    background_color: 0.95, 0.98, 0.95, 1  # Very light beige/green for background
+    border: (2, 2, 2, 2)
+    color: 0.1, 0.1, 0.1, 1 # Dark text color
+    font_size: '20sp'
+    size_hint: 0.3, 0.1  # Set button size relative to parent
+
+# Define a style for the Transaction Buttons (Buy Instad/Debt)
+<TxButton@Button>:
+    background_normal: ''
+    background_color: 0.7, 0.85, 0.7, 1 # Light green background
+    color: 0.1, 0.1, 0.1, 1
+    font_size: '18sp'
+    bold: True
+    size_hint: 0.45, 0.1 # Small size relative to its container
+
+# Define a style for the Sale Action Buttons (right column)
+<SaleActionButton@Button>:
+    background_normal: ''
+    background_color: 0.9, 0.9, 0.9, 1 # Light grey
+    color: 0, 0, 0, 1
+    font_size: '18sp'
+    size_hint_y: None
+    height: 45
+    margin: 5
+    
+# Define a style for Employee Action Buttons
+<EmployeeActionButton@Button>:
+    background_normal: ''
+    font_size: '20sp'
+    color: 0, 0, 0, 1
+    size_hint: 0.22, 0.8 # Size relative to its button container
+    bold: True
+    
+# --- Screen Manager Definition ---
+<CustomScreenManager>:
+
+# --- Main Screen Definition ---
+<MainScreen>:
+    name: 'main'
+    
+    RelativeLayout:
+        canvas.before:
+            Color:
+                rgba: 0.6, 0.7, 0.8, 1 # Medium grey-blue background
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: 'LABH HTOO EAIN(Main Section)'
+            size_hint: 1, 0.2
+            pos_hint: {'top': 1, 'x': 0}
+            font_size: '30sp'
+            bold: True
+            color: 0, 0, 0, 1
+
+        GridLayout:
+            size_hint: 0.9, 0.6
+            pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+            cols: 3
+            spacing: 20
+            padding: 20
+
+            # Row 1 Buttons
+            CustomButton:
+                text: 'Inventory'
+                on_press: app.root.current = 'inventory'
+
+            CustomButton:
+                text: 'Purchase'
+                on_press: app.root.current = 'purchase'
+
+            CustomButton:
+                text: 'Sale'
+                on_press: app.root.current = 'sale'
+
+            # Row 2 Buttons
+            CustomButton:
+                text: 'Employee Management'
+                on_press: app.root.current = 'employee_management'
+
+            CustomButton:
+                text: 'Damaged List'
+                on_press: app.root.current = 'damaged_list'
+
+            CustomButton:
+                text: 'Mothly List'
+                on_press: app.root.current = 'monthly_list'
+
+# --- Inventory Screen Definition ---
+<InventoryScreen>:
+    name: 'inventory'
+    
+    RelativeLayout:
+        canvas.before:
+            Color:
+                rgba: 0.6, 0.7, 0.8, 1 # Medium grey-blue background
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        
+        Label:
+            text: 'LABH HTOO EAIN(Inventory)'
+            size_hint: 1, 0.2
+            pos_hint: {'top': 1, 'x': 0}
+            font_size: '30sp'
+            bold: True
+            color: 0, 0, 0, 1
+            
+        BoxLayout:
+            size_hint: 0.9, 0.7
+            pos_hint: {'center_x': 0.5, 'center_y': 0.45}
+            orientation: 'vertical'
+            
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1 # White box for data
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            
+            Label:
+                text: 'Database columns (Product Nam, Quantity, buy price etc...) show here.'
+                size_hint_y: 1
+                font_size: '22sp'
+                color: 0.3, 0.3, 0.3, 1
+                text_size: self.size
+                valign: 'middle'
+                halign: 'center'
+
+        Button:
+            text: 'Exit'
+            size_hint: 0.15, 0.08
+            pos_hint: {'right': 0.95, 'bottom': 0.05}
+            font_size: '20sp'
+            background_normal: ''
+            background_color: 0.8, 0.2, 0.2, 1
+            color: 1, 1, 1, 1
+            on_press: app.root.current = 'main'
+
+# --- Purchase Screen Definition (Complex layout with tabs) ---
+<PurchaseScreen>:
+    name: 'purchase'
+    
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 5
+        spacing: 5
+        
+        # 1. Main Header / Back Button
+        BoxLayout:
+            size_hint_y: 0.08
+            padding: [10, 0, 10, 0]
+            
+            Label:
+                text: 'LABH HTOO EAIN(Purchase)'
+                font_size: '28sp'
+                bold: True
+                color: 0, 0, 0, 1
+                size_hint_x: 0.8
+            
+            Button:
+                text: '<< Back'
+                size_hint_x: 0.2
+                font_size: '18sp'
+                background_color: 0.8, 0.8, 0.8, 1
+                on_press: app.root.current = 'main'
+                
+        # 2. Top-Level TabbedPanel (Product Type: Tablet, Syrup, Injection, Myanmar)
+        TabbedPanel:
+            do_default_tab: False
+            tab_pos: 'top_left'
+            tab_width: 150
+            size_hint_y: 0.92
+            
+            # --- Tab 1: Tablet Purchase ---
+            TabbedPanelItem:
+                text: 'Tablet'
+                RelativeLayout:
+                    padding: 10
+                    
+                    # Title, Date, and Invoice Block (Top Right)
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint: 0.3, 0.2
+                        pos_hint: {'right': 1, 'top': 1}
+                        spacing: 5
+                        
+                        Label:
+                            text: 'Tablet Purchase'
+                            font_size: '24sp'
+                            color: 0, 0, 0, 1
+                            bold: True
+                            size_hint_y: None
+                            height: 40
+
+                        BoxLayout:
+                            Label:
+                                text: 'Date'
+                                size_hint_x: 0.3
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                text: '11/30/2025'
+                                size_hint_x: 0.7
+                        
+                        BoxLayout:
+                            Label:
+                                text: 'Invoice'
+                                size_hint_x: 0.3
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                size_hint_x: 0.7
+
+                    # Input Form Section (Left side - Green Box)
+                    RelativeLayout:
+                        size_hint: 0.65, 0.85
+                        pos_hint: {'x': 0, 'y': 0}
+                        padding: 10
+                        
+                        # Green background
+                        canvas.before:
+                            Color:
+                                rgba: 0.6, 0.8, 0.6, 1
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+                        # Input Grid for Labels and TextInputs
+                        GridLayout:
+                            cols: 2
+                            spacing: 15
+                            padding: 10
+                            size_hint: 0.95, 0.8
+                            pos_hint: {'center_x': 0.5, 'top': 0.95}
+                            
+                            # Row 1: Company Name
+                            Label:
+                                text: 'Company Name'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                                size_hint_x: 0.4
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                size_hint_x: 0.6
+                            
+                            # Row 2: Product Name
+                            Label:
+                                text: 'Product Name'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput: # Placeholder for dropdown
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                            
+                            # Row 3: Buy Price
+                            Label:
+                                text: 'Buy price'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                            
+                            # Row 4: Quantity (Box, Strip, Tablet)
+                            Label:
+                                text: 'Quantity'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            
+                            BoxLayout:
+                                orientation: 'vertical'
+                                
+                                TextInput:
+                                    multiline: False
+                                    size_hint_y: 0.6
+                                    height: 35
+                                
+                                BoxLayout:
+                                    size_hint_y: 0.4
+                                    # Custom Quantity Labels (Box, Strip, Tablet)
+                                    Label:
+                                        text: 'Box'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+                                    Label:
+                                        text: 'Strip'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+                                    Label:
+                                        text: 'Tablet'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+
+                            # Row 5: Amount (Standard)
+                            Label:
+                                text: 'Amount'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                
+                            # Row 6: Discount/FOC (Red Bar)
+                            BoxLayout:
+                                size_hint_y: None
+                                height: 40
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.7, 0.2, 0.2, 1
+                                    Rectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                        
+                                CheckBox:
+                                    group: 'discount_type'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.1
+                                Label:
+                                    text: 'Discount'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.4
+                                CheckBox:
+                                    group: 'discount_type'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.1
+                                Label:
+                                    text: 'FOC'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.4
+
+                            # Row 7: Discount/FOC Boxes
+                            BoxLayout:
+                                Label:
+                                    text: 'Dis Box'
+                                    color: 0, 0, 0, 1
+                                    size_hint_x: 0.5
+                                    halign: 'left'
+                                    text_size: self.size
+                                Label:
+                                    text: 'FOC Box'
+                                    color: 0, 0, 0, 1
+                                    size_hint_x: 0.5
+                                    halign: 'left'
+                                    text_size: self.size
+
+                            BoxLayout:
+                                TextInput:
+                                    multiline: False
+                                    size_hint_x: 0.5
+                                    size_hint_y: None
+                                    height: 35
+                                TextInput:
+                                    multiline: False
+                                    size_hint_x: 0.5
+                                    size_hint_y: None
+                                    height: 35
+                                    
+                            # Row 8: Total Amount
+                            Label:
+                                text: 'Total Amount'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                
+                        # Buy Buttons (Instad/Debt)
+                        BoxLayout:
+                            size_hint: 0.35, 0.1
+                            pos_hint: {'x': 0.65, 'y': 0.77}
+                            spacing: 10
+                            
+                            TxButton:
+                                text: 'Buy(Instad)'
+                            TxButton:
+                                text: 'Buy(Debt)'
+
+                    # Data View Section (Right side - White Box with inner tabs)
+                    BoxLayout:
+                        size_hint: 0.3, 0.7
+                        pos_hint: {'right': 1, 'y': 0.05}
+                        
+                        # Inner Tabbed Panel (Payment Type: Instad, Debt)
+                        TabbedPanel:
+                            do_default_tab: False
+                            tab_pos: 'top_left'
+                            tab_width: 80
+                            
+                            # Tab 1: Instad (Instant)
+                            TabbedPanelItem:
+                                text: 'Instad'
+                                BoxLayout:
+                                    Label:
+                                        text: 'In this box we have to show instand database columns (com name, product name, buy price etc...)'
+                                        color: 0.3, 0.3, 0.3, 1
+                                        text_size: self.size
+                                        valign: 'middle'
+                                        halign: 'center'
+                            
+                            # Tab 2: Debt (Credit)
+                            TabbedPanelItem:
+                                text: 'Debt'
+                                BoxLayout:
+                                    Label:
+                                        text: 'Database columns for Debt purchases show here.'
+                                        color: 0.3, 0.3, 0.3, 1
+                                        text_size: self.size
+                                        valign: 'middle'
+                                        halign: 'center'
+            
+            # --- Tab 2: Syrup Purchase ---
+            TabbedPanelItem:
+                text: 'Syrup'
+                RelativeLayout:
+                    padding: 10
+                    
+                    # Title, Date, and Invoice Block (Top Right)
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint: 0.3, 0.2
+                        pos_hint: {'right': 1, 'top': 1}
+                        spacing: 5
+                        
+                        Label:
+                            text: 'Syrup Purchase'
+                            font_size: '24sp'
+                            color: 0, 0, 0, 1
+                            bold: True
+                            size_hint_y: None
+                            height: 40
+
+                        BoxLayout:
+                            Label:
+                                text: 'Date'
+                                size_hint_x: 0.3
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                text: '11/30/2025'
+                                size_hint_x: 0.7
+                        
+                        BoxLayout:
+                            Label:
+                                text: 'Invoice'
+                                size_hint_x: 0.3
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                size_hint_x: 0.7
+
+                    # Input Form Section (Left side - Green Box)
+                    RelativeLayout:
+                        size_hint: 0.65, 0.85
+                        pos_hint: {'x': 0, 'y': 0}
+                        padding: 10
+                        
+                        # Green background
+                        canvas.before:
+                            Color:
+                                rgba: 0.6, 0.8, 0.6, 1
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+                        # Input Grid for Labels and TextInputs
+                        GridLayout:
+                            cols: 2
+                            spacing: 15
+                            padding: 10
+                            size_hint: 0.95, 0.8
+                            pos_hint: {'center_x': 0.5, 'top': 0.95}
+                            
+                            # Row 1: Company Name
+                            Label:
+                                text: 'Company Name'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                                size_hint_x: 0.4
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                size_hint_x: 0.6
+                            
+                            # Row 2: Product Name
+                            Label:
+                                text: 'Product Name'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput: # Placeholder for dropdown
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                            
+                            # Row 3: Buy Price
+                            Label:
+                                text: 'Buy price'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                            
+                            # Row 4: Quantity (Box, Strip, Tablet)
+                            Label:
+                                text: 'Quantity'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            
+                            BoxLayout:
+                                orientation: 'vertical'
+                                
+                                TextInput:
+                                    multiline: False
+                                    size_hint_y: 0.6
+                                    height: 35
+                                
+                                BoxLayout:
+                                    size_hint_y: 0.4
+                                    # Custom Quantity Labels (Box, Strip, Tablet)
+                                    Label:
+                                        text: 'Box'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+                                    Label:
+                                        text: 'Strip'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+                                    Label:
+                                        text: 'Tablet'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+
+                            # Row 5: Amount (Syrup specific - includes ML options)
+                            Label:
+                                text: 'Amount'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            BoxLayout:
+                                orientation: 'vertical'
+                                
+                                TextInput:
+                                    multiline: False
+                                    size_hint_y: 0.5
+                                    height: 35
+
+                                # Syrup specific radio button and input options
+                                BoxLayout:
+                                    size_hint_y: 0.5
+                                    orientation: 'horizontal'
+                                    spacing: 5
+                                    
+                                    # This is the Syrup ML selection part
+                                    Label:
+                                        text: '' # Spacer
+                                        size_hint_x: 0.05
+                                    CheckBox:
+                                        group: 'syrup_ml'
+                                        color: 0, 1, 0, 1
+                                        size_hint_x: 0.1
+                                    Label:
+                                        text: '20ml'
+                                        color: 0, 0, 0, 1
+                                        font_size: '14sp'
+                                        size_hint_x: 0.15
+                                    CheckBox:
+                                        group: 'syrup_ml'
+                                        color: 0, 1, 0, 1
+                                        size_hint_x: 0.1
+                                    Label:
+                                        text: '50ml'
+                                        color: 0, 0, 0, 1
+                                        font_size: '14sp'
+                                        size_hint_x: 0.15
+                                    CheckBox:
+                                        group: 'syrup_ml'
+                                        color: 0, 1, 0, 1
+                                        size_hint_x: 0.1
+                                    Label:
+                                        text: '100ml'
+                                        color: 0, 0, 0, 1
+                                        font_size: '14sp'
+                                        size_hint_x: 0.15
+                                    TextInput:
+                                        multiline: False
+                                        size_hint_x: 0.2
+
+                            # Row 6: Discount/FOC (Red Bar)
+                            BoxLayout:
+                                size_hint_y: None
+                                height: 40
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.7, 0.2, 0.2, 1
+                                    Rectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                        
+                                CheckBox:
+                                    group: 'discount_type'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.1
+                                Label:
+                                    text: 'Discount'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.4
+                                CheckBox:
+                                    group: 'discount_type'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.1
+                                Label:
+                                    text: 'FOC'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.4
+
+                            # Row 7: Discount/FOC Boxes
+                            BoxLayout:
+                                Label:
+                                    text: 'Dis Box'
+                                    color: 0, 0, 0, 1
+                                    size_hint_x: 0.5
+                                    halign: 'left'
+                                    text_size: self.size
+                                Label:
+                                    text: 'FOC Box'
+                                    color: 0, 0, 0, 1
+                                    size_hint_x: 0.5
+                                    halign: 'left'
+                                    text_size: self.size
+
+                            BoxLayout:
+                                TextInput:
+                                    multiline: False
+                                    size_hint_x: 0.5
+                                    size_hint_y: None
+                                    height: 35
+                                TextInput:
+                                    multiline: False
+                                    size_hint_x: 0.5
+                                    size_hint_y: None
+                                    height: 35
+                                    
+                            # Row 8: Total Amount
+                            Label:
+                                text: 'Total Amount'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                
+                        # Buy Buttons (Instad/Debt)
+                        BoxLayout:
+                            size_hint: 0.35, 0.1
+                            pos_hint: {'x': 0.65, 'y': 0.77}
+                            spacing: 10
+                            
+                            TxButton:
+                                text: 'Buy(Instad)'
+                            TxButton:
+                                text: 'Buy(Debt)'
+
+                    # Data View Section (Right side - White Box with inner tabs)
+                    BoxLayout:
+                        size_hint: 0.3, 0.7
+                        pos_hint: {'right': 1, 'y': 0.05}
+                        
+                        # Inner Tabbed Panel (Payment Type: Instad, Debt)
+                        TabbedPanel:
+                            do_default_tab: False
+                            tab_pos: 'top_left'
+                            tab_width: 80
+                            
+                            # Tab 1: Instad (Instant)
+                            TabbedPanelItem:
+                                text: 'Instad'
+                                BoxLayout:
+                                    Label:
+                                        text: 'In this box we have to show instand database columns (com name, product name, buy price etc...)'
+                                        color: 0.3, 0.3, 0.3, 1
+                                        text_size: self.size
+                                        valign: 'middle'
+                                        halign: 'center'
+                            
+                            # Tab 2: Debt (Credit)
+                            TabbedPanelItem:
+                                text: 'Debt'
+                                BoxLayout:
+                                    Label:
+                                        text: 'Database columns for Debt purchases show here.'
+                                        color: 0.3, 0.3, 0.3, 1
+                                        text_size: self.size
+                                        valign: 'middle'
+                                        halign: 'center'
+
+            # --- Tab 3: Injection Purchase ---
+            TabbedPanelItem:
+                text: 'Injection'
+                RelativeLayout:
+                    padding: 10
+                    
+                    # Title, Date, and Invoice Block (Top Right)
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint: 0.3, 0.2
+                        pos_hint: {'right': 1, 'top': 1}
+                        spacing: 5
+                        
+                        Label:
+                            text: 'Injection Purchase'
+                            font_size: '24sp'
+                            color: 0, 0, 0, 1
+                            bold: True
+                            size_hint_y: None
+                            height: 40
+
+                        BoxLayout:
+                            Label:
+                                text: 'Date'
+                                size_hint_x: 0.3
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                text: '11/30/2025'
+                                size_hint_x: 0.7
+                        
+                        BoxLayout:
+                            Label:
+                                text: 'Invoice'
+                                size_hint_x: 0.3
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                size_hint_x: 0.7
+
+                    # Input Form Section (Left side - Green Box)
+                    RelativeLayout:
+                        size_hint: 0.65, 0.85
+                        pos_hint: {'x': 0, 'y': 0}
+                        padding: 10
+                        
+                        # Green background
+                        canvas.before:
+                            Color:
+                                rgba: 0.6, 0.8, 0.6, 1
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+                        # Input Grid for Labels and TextInputs
+                        GridLayout:
+                            cols: 2
+                            spacing: 15
+                            padding: 10
+                            size_hint: 0.95, 0.8
+                            pos_hint: {'center_x': 0.5, 'top': 0.95}
+                            
+                            # Row 1: Company Name
+                            Label:
+                                text: 'Company Name'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                                size_hint_x: 0.4
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                size_hint_x: 0.6
+                            
+                            # Row 2: Product Name
+                            Label:
+                                text: 'Product Name'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput: # Placeholder for dropdown
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                            
+                            # Row 3: Buy Price
+                            Label:
+                                text: 'Buy price'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                            
+                            # Row 4: Quantity (Box, Strip, Tablet)
+                            Label:
+                                text: 'Quantity'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            
+                            BoxLayout:
+                                orientation: 'vertical'
+                                
+                                TextInput:
+                                    multiline: False
+                                    size_hint_y: 0.6
+                                    height: 35
+                                
+                                BoxLayout:
+                                    size_hint_y: 0.4
+                                    # Custom Quantity Labels (Box, Strip, Tablet)
+                                    Label:
+                                        text: 'Box'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+                                    Label:
+                                        text: 'Strip'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+                                    Label:
+                                        text: 'Tablet'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+
+                            # Row 5: Amount (Standard)
+                            Label:
+                                text: 'Amount'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                
+                            # Row 6: Discount/FOC (Red Bar)
+                            BoxLayout:
+                                size_hint_y: None
+                                height: 40
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.7, 0.2, 0.2, 1
+                                    Rectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                        
+                                CheckBox:
+                                    group: 'discount_type'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.1
+                                Label:
+                                    text: 'Discount'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.4
+                                CheckBox:
+                                    group: 'discount_type'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.1
+                                Label:
+                                    text: 'FOC'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.4
+
+                            # Row 7: Discount/FOC Boxes
+                            BoxLayout:
+                                Label:
+                                    text: 'Dis Box'
+                                    color: 0, 0, 0, 1
+                                    size_hint_x: 0.5
+                                    halign: 'left'
+                                    text_size: self.size
+                                Label:
+                                    text: 'FOC Box'
+                                    color: 0, 0, 0, 1
+                                    size_hint_x: 0.5
+                                    halign: 'left'
+                                    text_size: self.size
+
+                            BoxLayout:
+                                TextInput:
+                                    multiline: False
+                                    size_hint_x: 0.5
+                                    size_hint_y: None
+                                    height: 35
+                                TextInput:
+                                    multiline: False
+                                    size_hint_x: 0.5
+                                    size_hint_y: None
+                                    height: 35
+                                    
+                            # Row 8: Total Amount
+                            Label:
+                                text: 'Total Amount'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                
+                        # Buy Buttons (Instad/Debt)
+                        BoxLayout:
+                            size_hint: 0.35, 0.1
+                            pos_hint: {'x': 0.65, 'y': 0.77}
+                            spacing: 10
+                            
+                            TxButton:
+                                text: 'Buy(Instad)'
+                            TxButton:
+                                text: 'Buy(Debt)'
+
+                    # Data View Section (Right side - White Box with inner tabs)
+                    BoxLayout:
+                        size_hint: 0.3, 0.7
+                        pos_hint: {'right': 1, 'y': 0.05}
+                        
+                        # Inner Tabbed Panel (Payment Type: Instad, Debt)
+                        TabbedPanel:
+                            do_default_tab: False
+                            tab_pos: 'top_left'
+                            tab_width: 80
+                            
+                            # Tab 1: Instad (Instant)
+                            TabbedPanelItem:
+                                text: 'Instad'
+                                BoxLayout:
+                                    Label:
+                                        text: 'In this box we have to show instand database columns (com name, product name, buy price etc...)'
+                                        color: 0.3, 0.3, 0.3, 1
+                                        text_size: self.size
+                                        valign: 'middle'
+                                        halign: 'center'
+                            
+                            # Tab 2: Debt (Credit)
+                            TabbedPanelItem:
+                                text: 'Debt'
+                                BoxLayout:
+                                    Label:
+                                        text: 'Database columns for Debt purchases show here.'
+                                        color: 0.3, 0.3, 0.3, 1
+                                        text_size: self.size
+                                        valign: 'middle'
+                                        halign: 'center'
+
+            # --- Tab 4: Myanmar Medicine Purchase ---
+            TabbedPanelItem:
+                text: 'Myanmar'
+                RelativeLayout:
+                    padding: 10
+                    
+                    # Title, Date, and Invoice Block (Top Right)
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint: 0.3, 0.2
+                        pos_hint: {'right': 1, 'top': 1}
+                        spacing: 5
+                        
+                        Label:
+                            text: 'Myanmar Medicine Purchase'
+                            font_size: '24sp'
+                            color: 0, 0, 0, 1
+                            bold: True
+                            size_hint_y: None
+                            height: 40
+
+                        BoxLayout:
+                            Label:
+                                text: 'Date'
+                                size_hint_x: 0.3
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                text: '11/30/2025'
+                                size_hint_x: 0.7
+                        
+                        BoxLayout:
+                            Label:
+                                text: 'Invoice'
+                                size_hint_x: 0.3
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                size_hint_x: 0.7
+
+                    # Input Form Section (Left side - Green Box)
+                    RelativeLayout:
+                        size_hint: 0.65, 0.85
+                        pos_hint: {'x': 0, 'y': 0}
+                        padding: 10
+                        
+                        # Green background
+                        canvas.before:
+                            Color:
+                                rgba: 0.6, 0.8, 0.6, 1
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+
+                        # Input Grid for Labels and TextInputs
+                        GridLayout:
+                            cols: 2
+                            spacing: 15
+                            padding: 10
+                            size_hint: 0.95, 0.8
+                            pos_hint: {'center_x': 0.5, 'top': 0.95}
+                            
+                            # Row 1: Company Name
+                            Label:
+                                text: 'Company Name'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                                size_hint_x: 0.4
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                size_hint_x: 0.6
+                            
+                            # Row 2: Product Name
+                            Label:
+                                text: 'Product Name'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput: # Placeholder for dropdown
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                            
+                            # Row 3: Buy Price
+                            Label:
+                                text: 'Buy price'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                            
+                            # Row 4: Quantity (Box, Strip, Tablet)
+                            Label:
+                                text: 'Quantity'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            
+                            BoxLayout:
+                                orientation: 'vertical'
+                                
+                                TextInput:
+                                    multiline: False
+                                    size_hint_y: 0.6
+                                    height: 35
+                                
+                                BoxLayout:
+                                    size_hint_y: 0.4
+                                    # Custom Quantity Labels (Box, Strip, Tablet)
+                                    Label:
+                                        text: 'Box'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+                                    Label:
+                                        text: 'Strip'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+                                    Label:
+                                        text: 'Tablet'
+                                        font_size: '12sp'
+                                        color: 0, 0, 0, 1
+
+                            # Row 5: Amount (Standard)
+                            Label:
+                                text: 'Amount'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                
+                            # Row 6: Discount/FOC (Red Bar)
+                            BoxLayout:
+                                size_hint_y: None
+                                height: 40
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.7, 0.2, 0.2, 1
+                                    Rectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                        
+                                CheckBox:
+                                    group: 'discount_type'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.1
+                                Label:
+                                    text: 'Discount'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.4
+                                CheckBox:
+                                    group: 'discount_type'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.1
+                                Label:
+                                    text: 'FOC'
+                                    color: 1, 1, 1, 1
+                                    size_hint_x: 0.4
+
+                            # Row 7: Discount/FOC Boxes
+                            BoxLayout:
+                                Label:
+                                    text: 'Dis Box'
+                                    color: 0, 0, 0, 1
+                                    size_hint_x: 0.5
+                                    halign: 'left'
+                                    text_size: self.size
+                                Label:
+                                    text: 'FOC Box'
+                                    color: 0, 0, 0, 1
+                                    size_hint_x: 0.5
+                                    halign: 'left'
+                                    text_size: self.size
+
+                            BoxLayout:
+                                TextInput:
+                                    multiline: False
+                                    size_hint_x: 0.5
+                                    size_hint_y: None
+                                    height: 35
+                                TextInput:
+                                    multiline: False
+                                    size_hint_x: 0.5
+                                    size_hint_y: None
+                                    height: 35
+                                    
+                            # Row 8: Total Amount
+                            Label:
+                                text: 'Total Amount'
+                                halign: 'left'
+                                text_size: self.size
+                                color: 0, 0, 0, 1
+                            TextInput:
+                                multiline: False
+                                size_hint_y: None
+                                height: 35
+                                
+                        # Buy Buttons (Instad/Debt)
+                        BoxLayout:
+                            size_hint: 0.35, 0.1
+                            pos_hint: {'x': 0.65, 'y': 0.77}
+                            spacing: 10
+                            
+                            TxButton:
+                                text: 'Buy(Instad)'
+                            TxButton:
+                                text: 'Buy(Debt)'
+
+                    # Data View Section (Right side - White Box with inner tabs)
+                    BoxLayout:
+                        size_hint: 0.3, 0.7
+                        pos_hint: {'right': 1, 'y': 0.05}
+                        
+                        # Inner Tabbed Panel (Payment Type: Instad, Debt)
+                        TabbedPanel:
+                            do_default_tab: False
+                            tab_pos: 'top_left'
+                            tab_width: 80
+                            
+                            # Tab 1: Instad (Instant)
+                            TabbedPanelItem:
+                                text: 'Instad'
+                                BoxLayout:
+                                    Label:
+                                        text: 'In this box we have to show instand database columns (com name, product name, buy price etc...)'
+                                        color: 0.3, 0.3, 0.3, 1
+                                        text_size: self.size
+                                        valign: 'middle'
+                                        halign: 'center'
+                            
+                            # Tab 2: Debt (Credit)
+                            TabbedPanelItem:
+                                text: 'Debt'
+                                BoxLayout:
+                                    Label:
+                                        text: 'Database columns for Debt purchases show here.'
+                                        color: 0.3, 0.3, 0.3, 1
+                                        text_size: self.size
+                                        valign: 'middle'
+                                        halign: 'center'
+
+# --- Sale Screen Definition ---
+<SaleScreen>:
+    name: 'sale'
+
+    RelativeLayout:
+        # Main background color (Light Blue)
+        canvas.before:
+            Color:
+                rgba: 0.6, 0.9, 0.9, 1 
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        # 1. Top Header (Dark Blue Bar)
+        BoxLayout:
+            size_hint: 1, 0.1
+            pos_hint: {'top': 1}
+            padding: 5
+            spacing: 10
+            
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.4, 0.8, 1 # Dark Blue
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    
+            TextInput:
+                text: 'Invoice No'
+                size_hint_x: 0.15
+            TextInput:
+                text: 'Code'
+                size_hint_x: 0.1
+            Label:
+                text: 'LABH HTOO EAIN SALE'
+                color: 1, 1, 1, 1
+                font_size: '28sp'
+                bold: True
+                size_hint_x: 0.45
+            Label:
+                text: 'Date'
+                color: 1, 1, 1, 1
+                size_hint_x: 0.1
+            TextInput:
+                text: '11/30/2025'
+                size_hint_x: 0.2
+
+        # 2. Main Content Area
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, 0.8
+            pos_hint: {'top': 0.9}
+            padding: 10
+            spacing: 10
+
+            # --- A. Input Form (Left/Center) ---
+            GridLayout:
+                cols: 4
+                rows: 8
+                size_hint_x: 0.75
+                spacing: 10
+                padding: 10
+                
+                # --- Row 1: Medicine Type / Cash or Bill ---
+                Label:
+                    text: 'Medicine Type'
+                    color: 0, 0, 0, 1
+                    halign: 'left'
+                    text_size: self.size
+                TextInput: # Dropdown placeholder
+                Label:
+                    text: 'Cash or Bill'
+                    color: 0, 0, 0, 1
+                    halign: 'center'
+                    text_size: self.size
+                BoxLayout:
+                    # Cash / Bill Checkboxes
+                    CheckBox:
+                        group: 'payment_type'
+                        color: 0, 0, 0, 1
+                    Label:
+                        text: 'Cash'
+                        color: 0, 0, 0, 1
+                    CheckBox:
+                        group: 'payment_type'
+                        color: 0, 0, 0, 1
+                    Label:
+                        text: 'Bill'
+                        color: 0, 0, 0, 1
+
+                # --- Row 2: Name / Expire Date Check ---
+                Label:
+                    text: 'Name'
+                    color: 0, 0, 0, 1
+                    halign: 'left'
+                    text_size: self.size
+                TextInput:
+                Label:
+                    text: 'Expire Date Check'
+                    color: 0, 0, 0, 1
+                    halign: 'center'
+                    text_size: self.size
+                BoxLayout:
+                    # Expire Date Check / Sale Buttons
+                    TextInput:
+                        text: '11/30/2025'
+                        size_hint_x: 0.5
+                    Button:
+                        text: 'Can Sell'
+                        background_normal: ''
+                        background_color: 0, 0.8, 0, 1 # Green
+                        size_hint_x: 0.25
+                    Button:
+                        text: "Can't Sell"
+                        background_normal: ''
+                        background_color: 0.8, 0, 0, 1 # Red
+                        size_hint_x: 0.25
+                        
+                # --- Row 3: Quantity / Paying Format ---
+                Label:
+                    text: 'Quantity'
+                    color: 0, 0, 0, 1
+                    halign: 'left'
+                    text_size: self.size
+                BoxLayout:
+                    orientation: 'vertical'
+                    TextInput:
+                        size_hint_y: 0.6
+                    BoxLayout:
+                        size_hint_y: 0.4
+                        # Unit Checkboxes
+                        Label:
+                            text: 'Unit'
+                            color: 0, 0, 0, 1
+                        CheckBox:
+                            group: 'sale_unit'
+                        Label:
+                            text: 'Box'
+                            color: 0, 0, 0, 1
+                        CheckBox:
+                            group: 'sale_unit'
+                        Label:
+                            text: 'Strip'
+                            color: 0, 0, 0, 1
+                        CheckBox:
+                            group: 'sale_unit'
+                        Label:
+                            text: 'Tablet'
+                            color: 0, 0, 0, 1
+                Label:
+                    text: 'Paying Format'
+                    color: 0, 0, 0, 1
+                    halign: 'center'
+                    text_size: self.size
+                TextInput:
+
+                # --- Row 4: Unit / Amount ---
+                Label:
+                    text: 'Unit'
+                    color: 0, 0, 0, 1
+                    halign: 'left'
+                    text_size: self.size
+                TextInput: # Dropdown placeholder
+                Label:
+                    text: 'Amount'
+                    color: 0, 0, 0, 1
+                    halign: 'center'
+                    text_size: self.size
+                TextInput:
+
+                # --- Row 5: Price / Discount ---
+                Label:
+                    text: 'Price'
+                    color: 0, 0, 0, 1
+                    halign: 'left'
+                    text_size: self.size
+                TextInput:
+                Label:
+                    text: 'Discount'
+                    color: 0, 0, 0, 1
+                    halign: 'center'
+                    text_size: self.size
+                TextInput:
+
+                # --- Row 6: Empty / Total Amount ---
+                Label:
+                    text: '' # Placeholder
+                Label:
+                    text: '' # Placeholder
+                Label:
+                    text: 'Total Amount'
+                    color: 0, 0, 0, 1
+                    halign: 'center'
+                    text_size: self.size
+                TextInput:
+                
+                # --- Row 7 & 8: Customer Credit Details (Dark Red Box) ---
+                BoxLayout:
+                    size_hint_y: 2 # Span two rows
+                    size_hint_x: 4 # Span four columns (to align with screenshot)
+                    orientation: 'vertical'
+                    padding: 10
+                    spacing: 5
+                    
+                    canvas.before:
+                        Color:
+                            rgba: 0.5, 0.1, 0.1, 1 # Dark Red Background
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                            
+                    GridLayout:
+                        cols: 4
+                        spacing: 5
+                        padding: 5
+                        
+                        Label:
+                            text: 'Customer Name'
+                            color: 1, 1, 1, 1
+                        TextInput:
+                        Label:
+                            text: 'Customer Phno'
+                            color: 1, 1, 1, 1
+                        TextInput:
+                        Label:
+                            text: 'Credit Date'
+                            color: 1, 1, 1, 1
+                        TextInput:
+                            text: '11/30/2025'
+                        Label:
+                            text: 'Pay Amount'
+                            color: 1, 1, 1, 1
+                        TextInput:
+                        Label:
+                            text: 'Remaining Balance'
+                            color: 1, 1, 1, 1
+                        TextInput:
+
+            # --- B. Action Buttons (Right Column) ---
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.25
+                padding: [0, 10, 0, 10]
+                spacing: 15
+                
+                SaleActionButton:
+                    text: 'Sale'
+                    background_color: 0.7, 0.9, 0.7, 1
+                SaleActionButton:
+                    text: 'New'
+                SaleActionButton:
+                    text: 'Find'
+                SaleActionButton:
+                    text: 'Return'
+                SaleActionButton:
+                    text: 'Delete'
+                    background_color: 0.9, 0.7, 0.7, 1
+                SaleActionButton:
+                    text: 'Clear'
+                    background_color: 0.7, 0.7, 0.9, 1 # Added color for distinction
+
+        # 3. Bottom Tabs and Data Grid
+        BoxLayout:
+            size_hint: 1, 0.2
+            pos_hint: {'bottom': 0}
+            orientation: 'vertical'
+            
+            # Product Tabs at the bottom
+            TabbedPanel:
+                do_default_tab: False
+                tab_pos: 'top_left' # Using top_left here, as the tabs are above the data grid
+                tab_width: 150
+                size_hint_y: 0.1
+
+                TabbedPanelItem:
+                    text: 'Tablet'
+                TabbedPanelItem:
+                    text: 'Syrup'
+                TabbedPanelItem:
+                    text: 'Myanmar'
+                TabbedPanelItem:
+                    text: 'Injection'
+            
+            # Data Grid Placeholder (The large box with wooden top)
+            RelativeLayout:
+                size_hint_y: 0.9
+                padding: 10
+                
+                # Wooden/Brown Top Bar
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    pos_hint: {'top': 1}
+                    canvas.before:
+                        Color:
+                            rgba: 0.5, 0.35, 0.2, 1 
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                            
+                    # Date Picker on the right (similar to the purchase screen)
+                    BoxLayout:
+                        size_hint: 0.2, 1
+                        pos_hint: {'right': 0.98, 'top': 0.95}
+                        spacing: 5
+                        
+                        Label:
+                            text: 'Date'
+                            color: 1, 1, 1, 1
+                        TextInput:
+                            text: '11/30/2025'
+                            size_hint_x: 2
+
+                # Data Content Area
+                RelativeLayout:
+                    size_hint: 1, 0.8
+                    pos_hint: {'bottom': 0}
+                    canvas.before:
+                        Color:
+                            rgba: 0.8, 0.8, 0.8, 1 # Light Grey Content Area
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+                    Label:
+                        text: 'Data grid showing current sales transactions goes here.'
+                        font_size: '20sp'
+                        color: 0.3, 0.3, 0.3, 1
+                        text_size: self.size
+                        valign: 'middle'
+                        halign: 'center'
+
+# --- Employee Management Screen Definition ---
+<EmployeeManagementScreen>:
+    name: 'employee_management'
+    
+    RelativeLayout:
+        # Background color (Light Blue/Grey)
+        canvas.before:
+            Color:
+                rgba: 0.6, 0.75, 0.9, 1 # Light blue-grey background
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        # Main Title
+        Label:
+            text: 'Labh Htoo Eain Employee Management System'
+            font_size: '30sp'
+            bold: True
+            color: 0, 0, 0, 1
+            size_hint: 0.7, 0.1
+            pos_hint: {'center_x': 0.5, 'top': 0.95}
+        
+        # Back Button
+        Button:
+            text: '<< Back'
+            size_hint: 0.15, 0.05
+            pos_hint: {'x': 0.02, 'top': 0.95}
+            font_size: '16sp'
+            background_color: 0.8, 0.8, 0.8, 1
+            on_press: app.root.current = 'main'
+
+        # Input Form Section
+        GridLayout:
+            cols: 2
+            rows: 9 # 7 fields + Gender + Dates
+            spacing: 15
+            padding: [50, 0, 50, 0] # Horizontal padding to center inputs/labels
+            size_hint: 0.7, 0.4
+            pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+            
+            # Label Column (Fixed Width)
+            Label:
+                text: 'Employee Id'
+                halign: 'left'
+                text_size: self.size
+                color: 0, 0, 0, 1
+                size_hint_x: 0.4
+            # Input Column (Variable Width)
+            TextInput:
+                multiline: False
+                size_hint_y: None
+                height: 30
+
+            Label:
+                text: 'Employee Name'
+                halign: 'left'
+                text_size: self.size
+                color: 0, 0, 0, 1
+            TextInput:
+                multiline: False
+                size_hint_y: None
+                height: 30
+
+            Label:
+                text: 'Employee Position'
+                halign: 'left'
+                text_size: self.size
+                color: 0, 0, 0, 1
+            TextInput:
+                multiline: False
+                size_hint_y: None
+                height: 30
+
+            Label:
+                text: 'Email'
+                halign: 'left'
+                text_size: self.size
+                color: 0, 0, 0, 1
+            TextInput:
+                multiline: False
+                size_hint_y: None
+                height: 30
+
+            Label:
+                text: 'Address'
+                halign: 'left'
+                text_size: self.size
+                color: 0, 0, 0, 1
+            TextInput:
+                multiline: False
+                size_hint_y: None
+                height: 30
+
+            Label:
+                text: 'Phone Number'
+                halign: 'left'
+                text_size: self.size
+                color: 0, 0, 0, 1
+            TextInput:
+                multiline: False
+                size_hint_y: None
+                height: 30
+
+            Label:
+                text: 'Salary'
+                halign: 'left'
+                text_size: self.size
+                color: 0, 0, 0, 1
+            
+            # Gender Selection
+            BoxLayout:
+                size_hint_y: None
+                height: 30
+                CheckBox:
+                    group: 'gender'
+                    size_hint_x: 0.1
+                Label:
+                    text: 'Female'
+                    color: 0, 0, 0, 1
+                    size_hint_x: 0.3
+                CheckBox:
+                    group: 'gender'
+                    size_hint_x: 0.1
+                Label:
+                    text: 'Male'
+                    color: 0, 0, 0, 1
+                    size_hint_x: 0.5
+            
+            # Joining Date
+            Label:
+                text: 'Joining Date'
+                halign: 'left'
+                text_size: self.size
+                color: 0, 0, 0, 1
+            TextInput: # Placeholder for DatePicker/Dropdown
+                text: '11/30/2025'
+                size_hint_y: None
+                height: 30
+
+            # Employee Birthdate
+            Label:
+                text: 'Employee Birthdate'
+                halign: 'left'
+                text_size: self.size
+                color: 0, 0, 0, 1
+            TextInput: # Placeholder for DatePicker/Dropdown
+                text: '11/30/2025'
+                size_hint_y: None
+                height: 30
+        
+        # Action Buttons
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 20
+            size_hint: 0.5, 0.08
+            pos_hint: {'center_x': 0.5, 'y': 0.3} # Positioned below the input grid
+
+            EmployeeActionButton:
+                text: 'Save'
+                background_color: 0.9, 0.9, 0.4, 1 # Yellow
+            EmployeeActionButton:
+                text: 'Update'
+                background_color: 0.9, 0.9, 0.4, 1 # Yellow
+            EmployeeActionButton:
+                text: 'Find'
+                background_color: 0.9, 0.9, 0.4, 1 # Yellow
+            EmployeeActionButton:
+                text: 'Delete'
+                background_color: 0.4, 0.7, 0.9, 1 # Blue
+        
+        # Data View Section (Large Grey Box)
+        BoxLayout:
+            size_hint: 1, 0.28
+            pos_hint: {'bottom': 0}
+            padding: 10
+            
+            canvas.before:
+                Color:
+                    rgba: 0.7, 0.7, 0.7, 1 # Grey background
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                text: 'Employee data table view will appear here.'
+                font_size: '20sp'
+                color: 0.4, 0.4, 0.4, 1
+                text_size: self.size
+                valign: 'middle'
+                halign: 'center'
+
+# --- Damaged List Screen Definition ---
+<DamagedListScreen>:
+    name: 'damaged_list'
+
+    RelativeLayout:
+        # Background color (Light Blue/Grey)
+        canvas.before:
+            Color:
+                rgba: 0.6, 0.75, 0.9, 1 # Light blue-grey background
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        
+        # 1. Top Bar / Title / Back Button
+        BoxLayout:
+            size_hint: 1, 0.1
+            pos_hint: {'top': 1}
+            padding: 10
+            spacing: 10
+            
+            Button:
+                text: '<< Back'
+                size_hint_x: 0.15
+                font_size: '16sp'
+                background_color: 0.8, 0.8, 0.8, 1
+                on_press: app.root.current = 'main'
+            
+            Label:
+                text: 'Damaged List'
+                font_size: '28sp'
+                bold: True
+                color: 0, 0, 0, 1
+                size_hint_x: 0.65
+            
+            # Search Input (Dropdown or TextInput)
+            BoxLayout:
+                size_hint_x: 0.2
+
+                Label:
+                    text: 'Search by Name'
+                    color: 0, 0, 0, 1
+                    size_hint_x: 0.4
+                TextInput: # Placeholder for a dropdown/search input
+                    size_hint_x: 0.6
+                    text: 'Product Name'
+        
+        # 2. Main Content Area (Data Grid and Action Button)
+        BoxLayout:
+            size_hint: 0.9, 0.85
+            pos_hint: {'center_x': 0.5, 'center_y': 0.45}
+            spacing: 20
+            
+            # A. Data Grid (Left, Large)
+            RelativeLayout:
+                size_hint_x: 0.75
+                
+                canvas.before:
+                    Color:
+                        rgba: 0.6, 0.6, 0.6, 1 # Grey box
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                
+                Label:
+                    text: 'Data grid showing damaged items (product, quantity, date) goes here.'
+                    font_size: '20sp'
+                    color: 0.2, 0.2, 0.2, 1
+                    text_size: self.size
+                    valign: 'middle'
+                    halign: 'center'
+
+            # B. Action Button (Right, Red)
+            BoxLayout:
+                size_hint_x: 0.25
+                padding: [0, 50, 0, 50] # Vertical padding to center the button
+                
+                Button:
+                    text: 'Delete All'
+                    font_size: '28sp'
+                    bold: True
+                    background_normal: ''
+                    background_color: 0.9, 0.4, 0.4, 1 # Red-Orange color
+                    color: 1, 1, 1, 1
+                    size_hint_y: 0.4 # Making it a large, distinct block
+
+# --- Monthly List Screen Definition ---
+<MonthlyListScreen>:
+    name: 'monthly_list'
+
+    RelativeLayout:
+        # Background color (Light Grey, similar to other screens)
+        canvas.before:
+            Color:
+                rgba: 0.9, 0.9, 0.9, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        # 1. Top Bar / Title / Date
+        BoxLayout:
+            size_hint: 1, 0.1
+            pos_hint: {'top': 1}
+            padding: 10
+            spacing: 10
+            
+            # Back Button
+            Button:
+                text: '<< Back'
+                size_hint_x: 0.15
+                font_size: '16sp'
+                background_color: 0.8, 0.8, 0.8, 1
+                on_press: app.root.current = 'main'
+            
+            # Title Label (Centered)
+            Label:
+                text: 'Labh Htoo Eain Monthly List'
+                font_size: '28sp'
+                bold: True
+                color: 0, 0, 0, 1
+                size_hint_x: 0.65
+                
+            # Date Input (Right Side)
+            BoxLayout:
+                size_hint_x: 0.2
+                padding: 5
+                
+                Label:
+                    text: 'Date'
+                    color: 0, 0, 0, 1
+                    size_hint_x: 0.3
+                    halign: 'right'
+                    text_size: self.size
+                TextInput:
+                    size_hint_x: 0.7
+                    text: '11/30/2025'
+        
+        # 2. Main Data Area (Large Grey Box)
+        RelativeLayout:
+            size_hint: 0.95, 0.85
+            pos_hint: {'center_x': 0.5, 'center_y': 0.45}
+            padding: 10
+            
+            canvas.before:
+                Color:
+                    rgba: 0.6, 0.6, 0.6, 1 # Grey box
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            
+            Label:
+                text: 'Monthly summary data will appear here, organized by month or date.'
+                font_size: '22sp'
+                color: 0.2, 0.2, 0.2, 1
+                text_size: self.size
+                valign: 'middle'
+                halign: 'center'
