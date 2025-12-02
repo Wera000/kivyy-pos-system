@@ -1,0 +1,60 @@
+name: Build Kivy Android App
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.9"
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git unzip zlib1g-dev libffi-dev libssl-dev
+
+    - name: Install Buildozer
+      run: pip install buildozer cython
+
+    # ⭐ FULL ANDROID SDK INSTALL (fixes AIDL 100%)
+    - name: Install Android SDK
+      run: |
+        mkdir -p $HOME/android-sdk
+        wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+        unzip commandlinetools-linux-8512546_latest.zip -d $HOME/android-sdk
+        mkdir -p $HOME/android-sdk/cmdline-tools/latest
+        mv $HOME/android-sdk/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/
+
+        export ANDROID_HOME=$HOME/android-sdk
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+
+        yes | sdkmanager --licenses
+        sdkmanager "platform-tools"
+        sdkmanager "platforms;android-30"
+        sdkmanager "build-tools;30.0.3"
+
+    - name: Clean Buildozer
+      run: rm -rf .buildozer
+
+    - name: Build APK
+      env:
+        ANDROID_HOME: $HOME/android-sdk
+        PATH: $HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH
+      run: buildozer android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: Kivy-Android-App
+        path: bin/*.apk
