@@ -14,43 +14,46 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # Fix 1: Python 3.9 Environment ကို တပ်ဆင်ခြင်း 
-    - name: Set up Python 3.9 Environment
+    - name: Set up Python 3.9
       uses: actions/setup-python@v5
       with:
-        python-version: '3.9'
-        
-    # Fix 2: System Dependencies (Aidl 32-bit Dependency ထည့်သွင်းခြင်း)
-    - name: Install System Dependencies
+        python-version: "3.9"
+
+    - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git build-essential unzip zlib1g-dev libffi-dev libssl-dev 
-        # Aidl 32-bit fix:
-        sudo dpkg --add-architecture i386
-        sudo apt-get update
-        sudo apt-get install -y libstdc++6:i386
+        sudo apt-get install -y git unzip zlib1g-dev libffi-dev libssl-dev \
+          libc6:i386 libncurses5:i386 libstdc++6:i386 libgcc1:i386
 
-    # Fix 3: Python Libraries များကို 3.9 Environment တွင် Install လုပ်ပါ
-    - name: Install Buildozer and Python Libraries
-      run: pip install buildozer cython setuptools==65.5.0
+    - name: Install Buildozer
+      run: pip install buildozer cython
 
-    # Fix 4: Buildozer Cache Files များကို ရှင်းပစ်ပါ (Install ပြီးမှ Clean)
-    - name: Clean Buildozer Cache Files
+    # ⭐ FIX: INSTALL FULL ANDROID SDK + ACCEPT LICENSES
+    - name: Install Android SDK
       run: |
-        rm -rf ~/.buildozer
-        rm -rf $HOME/.buildozer
+        mkdir -p $HOME/android-sdk
+        wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+        unzip commandlinetools-linux-8512546_latest.zip -d $HOME/android-sdk
+        mkdir -p $HOME/android-sdk/cmdline-tools/latest
+        mv $HOME/android-sdk/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/
         
-    # === NEW FIX 5: Aidl Build Tools များကို Manual Force Install လုပ်ခြင်း ===
-    - name: Force SDK Build Tools Install and License Accept
-      run: |
-        # Buildozer ကို manual update လုပ်ခိုင်းပြီး SDK Tools တွေကို Install လုပ်သည်
-        buildozer android update
-        # 30.0.3 Build Tools ကို force install လုပ်ပြီး License ကို လက်ခံသည်
-        yes | sdkmanager "build-tools;30.0.3" --licenses || true
+        export ANDROID_HOME=$HOME/android-sdk
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+        
+        yes | sdkmanager --licenses
+        
+        sdkmanager "platform-tools"
+        sdkmanager "platforms;android-30"
+        sdkmanager "build-tools;30.0.3"
 
-    - name: Build Android APK
-      # Build ကို စတင်ပါ
-      run: buildozer android debug --android-ndk 21e
+    - name: Clean Buildozer Folder
+      run: rm -rf .buildozer
+
+    - name: Build APK
+      env:
+        ANDROID_HOME: $HOME/android-sdk
+        PATH: $HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH
+      run: buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
