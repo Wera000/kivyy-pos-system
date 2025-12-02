@@ -20,13 +20,16 @@ jobs:
       with:
         python-version: "3.9"
 
-    # Fix 2: System Dependencies (Aidl 32-bit Dependency Fix)
+    # Fix 2: System Dependencies (Aidl 32-bit Dependency Fix + Build Tools)
     - name: Install System Dependencies (Aidl Fix)
       run: |
         sudo apt-get update
-        # CRITICAL FIX: Ensure GIT is installed first, as Buildozer checks for it immediately.
-        sudo apt-get install -y git
-        sudo apt-get install -y build-essential unzip zlib1g-dev libffi-dev libssl-dev 
+        # CRITICAL FIX: Ensure GIT and build-essential are available for Toolchain building.
+        sudo apt-get install -y git build-essential unzip
+        
+        # Install remaining system dependencies
+        sudo apt-get install -y zlib1g-dev libffi-dev libssl-dev 
+        
         # Aidl tool requires this 32-bit library on 64-bit systems
         sudo dpkg --add-architecture i386
         sudo apt-get update
