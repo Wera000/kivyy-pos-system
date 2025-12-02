@@ -14,28 +14,33 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # Fix 1: Cache အဟောင်းကို ရှင်းပစ်ခြင်း (Distutils Error ပျောက်ကင်းစေရန်)
-    - name: Delete Buildozer Cache
-      run: |
-        rm -rf ~/.buildozer
-        rm -rf $HOME/.buildozer
+    # === အရေးကြီးဆုံးအဆင့်: Job တစ်ခုလုံးကို Python 3.9 သို့ ပြောင်းလဲခြင်း ===
+    - name: Set up Python 3.9 Environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+    
+    # 3.9 သို့ ပြောင်းပြီးနောက် Cache အဟောင်းကို ရှင်းပစ်ခြင်း
+    - name: Clean Buildozer Cache Files
+      run: rm -rf ~/.buildozer
 
-    - name: Set up Environment (Install All Dependencies)
+    # စနစ် Dependencies များကိုသာ Install လုပ်ခြင်း
+    - name: Install System Dependencies
       run: |
         sudo apt-get update
-        # Fix 2: Ubuntu Dependencies Install
-        sudo apt-get install -y python3-pip git build-essential unzip zlib1g-dev libffi-dev libssl-dev libncurses-dev python3-distutils || true
-        sudo apt-get install -y libpython3.12-stdlib python3.12-distutils libncursesw6 || true
-        
-    - name: Install Buildozer and Build Dependencies (Python Libraries)
+        # Base dependencies 
+        sudo apt-get install -y git build-essential unzip zlib1g-dev libffi-dev libssl-dev
+
+    # Python Packages များကို ယခု 3.9 Environment တွင် Install လုပ်မည်
+    - name: Install Buildozer and Python Libraries
       run: pip install buildozer cython setuptools==65.5.0
 
-    - name: Clean Buildozer Cache (Buildozer Command Run)
-      # Fix 3: Buildozer Command ကို Install ပြီးမှ Run ပါ
+    # Clean Command ကို 3.9 Environment မှ Run ပါ
+    - name: Clean Buildozer Project
       run: buildozer android clean 
 
     - name: Build Android APK
-      # Fix 4: NDK 21e နှင့် Python 3.9 ကို buildozer.spec မှ သုံးပြီး Build ကို စတင်ပါ
+      # NDK 21e နှင့် 3.9 (spec ထဲမှ) ကို သုံးပြီး Build ကို စတင်ပါ
       run: buildozer android debug --android-ndk 21e
 
     - name: Upload APK
