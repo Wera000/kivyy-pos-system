@@ -18,6 +18,8 @@ android.minapi = 21
 android.ndk = 21b
 android.accept_licenses = True
 android.sdk_path = /home/runner/android-sdk
+android.sdkmanager_path = /home/runner/android-sdk/cmdline-tools/latest/bin/sdkmanager
+
 
 # ❌ REMOVE THIS LINE — IT BREAKS YOUR BUILD
 # p4a.broken_recipes = aidl
