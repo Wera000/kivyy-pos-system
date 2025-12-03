@@ -20,9 +20,9 @@ jobs:
         sudo apt install -y \
           zip unzip wget git \
           openjdk-17-jdk \
-          build-essential \
-          zlib1g-dev libffi-dev libssl-dev \
-          libstdc++6:i386
+          build-essential zlib1g-dev libffi-dev libssl-dev
+        git --version
+        java -version
 
     # 2️⃣ PYTHON 3.9
     - name: Set up Python
