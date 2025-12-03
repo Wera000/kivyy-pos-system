@@ -17,6 +17,7 @@ android.api = 30
 android.minapi = 21
 android.ndk = 21b
 android.accept_licenses = True
+android.sdk_path = /home/runner/android-sdk
 
 # ❌ REMOVE THIS LINE — IT BREAKS YOUR BUILD
 # p4a.broken_recipes = aidl
