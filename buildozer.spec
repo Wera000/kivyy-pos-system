@@ -17,14 +17,10 @@ android.api = 30
 android.minapi = 21
 android.ndk = 21b
 android.accept_licenses = True
+
+# FORCE Buildozer to use our SDK + sdkmanager path
 android.sdk_path = /home/runner/android-sdk
 android.sdkmanager_path = /home/runner/android-sdk/cmdline-tools/latest/bin/sdkmanager
 
-
-# ❌ REMOVE THIS LINE — IT BREAKS YOUR BUILD
+# COMMENT OUT broken recipes
 # p4a.broken_recipes = aidl
-
-
-[buildozer]
-log_level = 2
-warn_on_error = 0
