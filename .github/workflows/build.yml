@@ -1,9 +1,8 @@
-name: Build Kivy Android App
+name: Build Kivy Android APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -11,34 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Checkout Repository
-    - name: Checkout Code
+    - name: Checkout code
       uses: actions/checkout@v4
 
-    # 2️⃣ Install System Dependencies
+    # 1️⃣ SYSTEM DEPENDENCIES
     - name: Install System Dependencies
       run: |
         sudo apt update
         sudo apt install -y \
-          git zip unzip wget openjdk-17-jdk \
-          build-essential zlib1g-dev libffi-dev libssl-dev
-        git --version
-        java -version
+          zip unzip wget git \
+          openjdk-17-jdk \
+          build-essential \
+          zlib1g-dev libffi-dev libssl-dev \
+          libstdc++6:i386
 
-    # 3️⃣ Set Up Python 3.9
-    - name: Set up Python 3.9
+    # 2️⃣ PYTHON 3.9
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
-    # 4️⃣ Install Buildozer + Cython
+    # 3️⃣ BUILD TOOLS
     - name: Install Buildozer
       run: |
         pip install --upgrade pip
-        pip install cython buildozer setuptools==65.5.0
+        pip install buildozer cython setuptools==65.5.0
 
-    # 5️⃣ Install Android SDK & NDK (FINAL FIX)
-    - name: Install Android SDK & NDK (FINAL SDKMANAGER FIX)
+    # 4️⃣ ANDROID SDK FIX (CORRECT LAYOUT)
+    - name: Install Android SDK (FINAL FIX)
       run: |
         mkdir -p $HOME/android-sdk
         cd $HOME/android-sdk
@@ -52,26 +51,28 @@ jobs:
         export ANDROID_HOME=$HOME/android-sdk
         export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
 
-        # Clean Buildozer cache to avoid old broken SDK/NDK
-        rm -rf ~/.buildozer
-        rm -rf ~/.gradle
-
         sdkmanager --version
         yes | sdkmanager --licenses
 
         sdkmanager \
           "platform-tools" \
           "platforms;android-30" \
-          "build-tools;30.0.3" \
-          "ndk;21.4.7075529"
+          "build-tools;30.0.3"
 
-        echo "===== SDKMANAGER LOCATION ====="
-        which sdkmanager
+    # 5️⃣ MANUAL NDK INSTALL (BLOCK BUILDOZER AUTO-DOWNLOAD)
+    - name: Install Android NDK r21b (Manual)
+      run: |
+        mkdir -p $HOME/.buildozer/android/platform
+        cd $HOME/.buildozer/android/platform
 
-        echo "===== AIDL LOCATION ====="
-        find $ANDROID_HOME -name aidl
+        wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
+        unzip -q android-ndk-r21b-linux-x86_64.zip
 
-    # 6️⃣ Build APK
+    # 6️⃣ CLEAN BUILDOZER CACHE
+    - name: Clean Buildozer Cache
+      run: rm -rf ~/.buildozer
+
+    # 7️⃣ BUILD APK
     - name: Build APK
       env:
         ANDROID_HOME: $HOME/android-sdk
@@ -82,9 +83,9 @@ jobs:
         export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools
         buildozer android debug
 
-    # 7️⃣ Upload APK Artifact
+    # 8️⃣ UPLOAD APK
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: Kivy-Android-App
+        name: My-Kivy-APK
         path: bin/*.apk
