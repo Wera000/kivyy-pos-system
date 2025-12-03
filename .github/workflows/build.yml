@@ -37,7 +37,7 @@ jobs:
         pip install --upgrade pip
         pip install cython buildozer setuptools==65.5.0
 
-    # 5️⃣ Install Android SDK & NDK (FINAL SDKMANAGER FIX)
+    # 5️⃣ Install Android SDK & NDK (FINAL FIX)
     - name: Install Android SDK & NDK (FINAL SDKMANAGER FIX)
       run: |
         mkdir -p $HOME/android-sdk
@@ -51,6 +51,10 @@ jobs:
 
         export ANDROID_HOME=$HOME/android-sdk
         export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+
+        # Clean Buildozer cache to avoid old broken SDK/NDK
+        rm -rf ~/.buildozer
+        rm -rf ~/.gradle
 
         sdkmanager --version
         yes | sdkmanager --licenses
@@ -67,22 +71,18 @@ jobs:
         echo "===== AIDL LOCATION ====="
         find $ANDROID_HOME -name aidl
 
-    # 6️⃣ Force Clean Buildozer Cache
-    - name: Destroy Buildozer Cache
-      run: |
-        rm -rf ~/.buildozer
-        rm -rf ~/.gradle
-
-    # 7️⃣ Build APK
+    # 6️⃣ Build APK
     - name: Build APK
       env:
         ANDROID_HOME: $HOME/android-sdk
+        ANDROID_SDK_ROOT: $HOME/android-sdk
+        ANDROID_NDK_HOME: $HOME/.buildozer/android/platform/android-ndk-r21b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
       run: |
         export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools
         buildozer android debug
 
-    # 8️⃣ Upload APK Artifact
+    # 7️⃣ Upload APK Artifact
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
