@@ -11,10 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # ✅ 1. Checkout Repository
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # ✅ SYSTEM DEPENDENCIES
+    # ✅ 2. Install System Dependencies
     - name: Install System Dependencies
       run: |
         sudo apt update
@@ -24,27 +25,29 @@ jobs:
         git --version
         java -version
 
-    # ✅ PYTHON 3.9
+    # ✅ 3. Set Up Python 3.9 (Stable for Buildozer)
     - name: Set up Python 3.9
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
-    # ✅ BUILDOZER + CYTHON
+    # ✅ 4. Install Buildozer + Cython
     - name: Install Buildozer
       run: |
         pip install --upgrade pip
         pip install cython buildozer setuptools==65.5.0
 
-    # ✅ ANDROID SDK + NDK (AIDL FIXED)
+    # ✅ 5. Install Android SDK + NDK (SAFE VERSION – NO FOLDER BUG)
     - name: Install Android SDK & NDK
       run: |
         mkdir -p $HOME/android-sdk
-        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-        unzip commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk
+        cd $HOME/android-sdk
 
-        mkdir -p $HOME/android-sdk/cmdline-tools/latest
-        mv $HOME/android-sdk/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest
+        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip commandlinetools-linux-11076708_latest.zip
+
+        mkdir -p cmdline-tools/latest
+        mv cmdline-tools/* cmdline-tools/latest || true
 
         export ANDROID_HOME=$HOME/android-sdk
         export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
@@ -59,11 +62,11 @@ jobs:
 
         ls $ANDROID_HOME/build-tools/30.0.3/aidl
 
-    # ✅ CLEAN CACHE
+    # ✅ 6. Clean Buildozer Cache
     - name: Clean Buildozer
       run: rm -rf ~/.buildozer
 
-    # ✅ BUILD APK
+    # ✅ 7. Build APK
     - name: Build APK
       env:
         ANDROID_HOME: $HOME/android-sdk
@@ -72,7 +75,7 @@ jobs:
         export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools
         buildozer android debug
 
-    # ✅ UPLOAD APK
+    # ✅ 8. Upload APK Artifact
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
