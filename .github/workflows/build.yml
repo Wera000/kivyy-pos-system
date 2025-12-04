@@ -59,7 +59,7 @@ jobs:
 
         yes | sdkmanager --licenses
 
-        # Install ONLY stable versions to avoid build-tools;36.x failure
+        # Install ONLY stable tools (NOT 36.x)
         sdkmanager \
           "platform-tools" \
           "platforms;android-30" \
@@ -79,7 +79,14 @@ jobs:
         rm android-ndk-r25b-linux.zip
 
     # -----------------------------
-    # Build APK
+    # CLEAR BUILDOZER CACHE
+    # -----------------------------
+    - name: Clear Buildozer Internal Cache
+      run: |
+        rm -rf ~/.buildozer
+
+    # -----------------------------
+    # BUILD APK
     # -----------------------------
     - name: Build APK
       env:
@@ -87,16 +94,18 @@ jobs:
         ANDROID_SDK_ROOT: $HOME/android-sdk
         ANDROID_NDK_HOME: $HOME/android-ndk/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+
+        # THE FIX THAT STOPS build-tools 36.x
         P4A_NO_ANDROID_PACKAGE_INSTALL: 1
+
       run: |
         export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
         export PATH=$PATH:$ANDROID_HOME/platform-tools
 
         buildozer android debug
 
-
     # -----------------------------
-    # Upload output APK
+    # Upload APK
     # -----------------------------
     - name: Upload APK
       uses: actions/upload-artifact@v4
