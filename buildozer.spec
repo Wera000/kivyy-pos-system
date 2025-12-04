@@ -14,6 +14,8 @@ requirements = python3==3.9,kivy
 
 android.api = 30
 android.minapi = 21
+android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r25b
+
 
 # ✅ DO NOT FORCE OLD NDK
 # ❌ android.ndk = 21b  (REMOVED)
