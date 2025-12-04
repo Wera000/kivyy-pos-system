@@ -30,7 +30,6 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython setuptools==65.5.0
 
-    # 🔥 CLEAN BEFORE INSTALLING SDK/NDK
     - name: Clean Buildozer Cache (IMPORTANT)
       run: rm -rf $HOME/.buildozer
 
@@ -40,7 +39,7 @@ jobs:
         cd $HOME/android-sdk
 
         wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O tools.zip
-        unzip tools.zip
+        unzip -q tools.zip
 
         mkdir -p cmdline-tools/latest
         mv cmdline-tools/* cmdline-tools/latest || true
@@ -55,12 +54,14 @@ jobs:
           "platforms;android-30" \
           "build-tools;30.0.3"
 
-    # 🔥 FIX THE MISSING sdkmanager PATH (THIS FIXES YOUR LATEST ERROR)
-    - name: Fix sdkmanager for Buildozer
+    - name: Fix sdkmanager for Buildozer (symlink + debug)
       run: |
         mkdir -p $HOME/android-sdk/tools/bin
-        ln -sf $HOME/android-sdk/ccmdline-tools/latest/bin/sdkmanager $HOME/android-sdk/tools/bin/sdkmanager
+        ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/android-sdk/tools/bin/sdkmanager
         ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/avdmanager $HOME/android-sdk/tools/bin/avdmanager
+        # ensure the bin is executable and show it in logs for verification
+        ls -l $HOME/android-sdk/tools/bin || true
+        $HOME/android-sdk/tools/bin/sdkmanager --version || true
 
     - name: Install Android NDK 25b
       run: |
