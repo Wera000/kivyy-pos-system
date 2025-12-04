@@ -20,21 +20,22 @@ fullscreen = 0
 android.api = 30
 android.minapi = 21
 
-# VERY important: match GitHub Actions setup
+# NDK / build
 android.ndk = 25b
 android.ndk_api = 25
-
-android.archs = arm64-v8a, armeabi-v7a
 android.bootstrap = sdl2
-
-# Fix: do NOT set a manual ndk_path (GitHub Actions sets it)
-# android.ndk_path = (removed)
+android.archs = arm64-v8a, armeabi-v7a
 
 # Permissions
 android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE
 
-# Required for including libs correctly
+# Include libs
 android.copy_libs = 1
 
 # Versioning
 version = 0.1
+
+# -----------------------------------------
+# Notes:
+# 1. Do NOT set android.ndk_path → workflow handles it
+# 2. Do NOT specify build-tools → workflow uses 30.0.3
