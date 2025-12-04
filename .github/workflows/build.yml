@@ -10,23 +10,38 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+    # -----------------------------
+    # Checkout code
+    # -----------------------------
     - uses: actions/checkout@v4
 
+    # -----------------------------
+    # Install system dependencies
+    # -----------------------------
     - name: Install System Dependencies
       run: |
         sudo apt update
         sudo apt install -y zip unzip git wget openjdk-17-jdk build-essential zlib1g-dev libffi-dev libssl-dev
 
+    # -----------------------------
+    # Setup Python 3.9
+    # -----------------------------
     - name: Set up Python 3.9
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
-    - name: Install Buildozer & Python-for-Android
+    # -----------------------------
+    # Install Buildozer & Python-for-Android
+    # -----------------------------
+    - name: Install Buildozer & P4A
       run: |
         pip install --upgrade pip
         pip install buildozer==1.5.0 cython==0.29.36 python-for-android==2024.1.21 setuptools==65.5.0
 
+    # -----------------------------
+    # Install Android SDK & accept licenses
+    # -----------------------------
     - name: Install Android SDK
       run: |
         mkdir -p $HOME/android-sdk
@@ -41,6 +56,9 @@ jobs:
         yes | sdkmanager --licenses
         sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "extras;android;m2repository" "extras;google;m2repository"
 
+    # -----------------------------
+    # Install Android NDK 25b
+    # -----------------------------
     - name: Install Android NDK 25b
       run: |
         mkdir -p $HOME/android-ndk
@@ -49,9 +67,15 @@ jobs:
         unzip -q android-ndk-r25b-linux.zip
         rm android-ndk-r25b-linux.zip
 
+    # -----------------------------
+    # Clear Buildozer cache
+    # -----------------------------
     - name: Clear Buildozer Cache
       run: rm -rf ~/.buildozer
 
+    # -----------------------------
+    # Build APK
+    # -----------------------------
     - name: Build APK
       env:
         ANDROID_HOME: $HOME/android-sdk
@@ -64,6 +88,9 @@ jobs:
         export PATH=$PATH:$ANDROID_HOME/platform-tools
         buildozer android debug
 
+    # -----------------------------
+    # Upload APK
+    # -----------------------------
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
