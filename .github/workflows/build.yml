@@ -12,7 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: System Deps
+    # -------------------------------
+    - name: System Dependencies
       run: |
         sudo apt update
         sudo apt install -y \
@@ -20,27 +21,29 @@ jobs:
           openjdk-17-jdk \
           build-essential zlib1g-dev libffi-dev libssl-dev
 
-    - name: Python 3.9
+    # -------------------------------
+    - name: Install Python 3.9
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
-    - name: Install Buildozer
+    # -------------------------------
+    - name: Install/Upgrade Buildozer + p4a
       run: |
         pip install --upgrade pip
-        pip install buildozer cython setuptools==65.5.0
+        pip install --upgrade buildozer python-for-android cython setuptools==65.5.0
 
-    - name: Clean Buildozer Cache (IMPORTANT)
+    # -------------------------------
+    - name: Clean Buildozer Cache (important)
       run: rm -rf $HOME/.buildozer
 
+    # -------------------------------
     - name: Install Android SDK + Licenses
       run: |
         mkdir -p $HOME/android-sdk
         cd $HOME/android-sdk
-
         wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O tools.zip
         unzip -q tools.zip
-
         mkdir -p cmdline-tools/latest
         mv cmdline-tools/* cmdline-tools/latest || true
 
@@ -54,15 +57,17 @@ jobs:
           "platforms;android-30" \
           "build-tools;30.0.3"
 
-    - name: Fix sdkmanager for Buildozer (symlink + debug)
+    # -------------------------------
+    - name: Fix sdkmanager path for Buildozer
       run: |
         mkdir -p $HOME/android-sdk/tools/bin
         ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/android-sdk/tools/bin/sdkmanager
         ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/avdmanager $HOME/android-sdk/tools/bin/avdmanager
-        # ensure the bin is executable and show it in logs for verification
-        ls -l $HOME/android-sdk/tools/bin || true
-        $HOME/android-sdk/tools/bin/sdkmanager --version || true
+        # Debug: show sdkmanager
+        ls -l $HOME/android-sdk/tools/bin
+        $HOME/android-sdk/tools/bin/sdkmanager --version
 
+    # -------------------------------
     - name: Install Android NDK 25b
       run: |
         mkdir -p $HOME/.buildozer/android/platform
@@ -70,6 +75,7 @@ jobs:
         wget https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
         unzip -q android-ndk-r25b-linux.zip
 
+    # -------------------------------
     - name: Build APK
       env:
         ANDROID_HOME: $HOME/android-sdk
@@ -79,8 +85,10 @@ jobs:
       run: |
         export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin
         export PATH=$PATH:$HOME/android-sdk/platform-tools
-        buildozer android debug
+        # Force modern NDK API to avoid 404s
+        buildozer android debug --ndk-api=25
 
+    # -------------------------------
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
