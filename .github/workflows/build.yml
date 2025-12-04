@@ -10,34 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    # 1️⃣ SYSTEM DEPENDENCIES
-    - name: Install System Dependencies
+    # 1️⃣ SYSTEM
+    - name: System Deps
       run: |
         sudo apt update
         sudo apt install -y \
           zip unzip wget git \
           openjdk-17-jdk \
           build-essential zlib1g-dev libffi-dev libssl-dev
-        git --version
-        java -version
 
-    # 2️⃣ PYTHON 3.9
-    - name: Set up Python
+    # 2️⃣ PYTHON
+    - name: Python 3.9
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
-    # 3️⃣ BUILD TOOLS
+    # 3️⃣ BUILDOZER
     - name: Install Buildozer
       run: |
         pip install --upgrade pip
         pip install buildozer cython setuptools==65.5.0
 
-    # 4️⃣ ANDROID SDK FIX (CORRECT LAYOUT)
-    - name: Install Android SDK (FINAL FIX)
+    # 4️⃣ ANDROID SDK (REAL LAYOUT)
+    - name: Install Android SDK
       run: |
         mkdir -p $HOME/android-sdk
         cd $HOME/android-sdk
@@ -51,7 +48,6 @@ jobs:
         export ANDROID_HOME=$HOME/android-sdk
         export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
 
-        sdkmanager --version
         yes | sdkmanager --licenses
 
         sdkmanager \
@@ -59,20 +55,26 @@ jobs:
           "platforms;android-30" \
           "build-tools;30.0.3"
 
-    # 5️⃣ MANUAL NDK INSTALL (BLOCK BUILDOZER AUTO-DOWNLOAD)
-    - name: Install Android NDK r21b (Manual)
+    # 5️⃣ 🔥 CREATE FAKE OLD SDKMANAGER PATH (FINAL BOSS KILL)
+    - name: Fake Tools SDK Path (PERMANENT FIX)
+      run: |
+        mkdir -p $HOME/android-sdk/tools/bin
+        ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+              $HOME/android-sdk/tools/bin/sdkmanager
+
+    # 6️⃣ 🔒 MANUAL NDK 21b ONLY
+    - name: Install Android NDK 21b (LOCKED)
       run: |
         mkdir -p $HOME/.buildozer/android/platform
         cd $HOME/.buildozer/android/platform
-
         wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
         unzip -q android-ndk-r21b-linux-x86_64.zip
 
-    # 6️⃣ CLEAN BUILDOZER CACHE
-    - name: Clean Buildozer Cache
+    # 7️⃣ CLEAN
+    - name: Clean Cache
       run: rm -rf ~/.buildozer
 
-    # 7️⃣ BUILD APK
+    # 8️⃣ BUILD APK
     - name: Build APK
       env:
         ANDROID_HOME: $HOME/android-sdk
@@ -80,10 +82,12 @@ jobs:
         ANDROID_NDK_HOME: $HOME/.buildozer/android/platform/android-ndk-r21b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
       run: |
-        export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools
+        export PATH=$PATH:$HOME/android-sdk/tools/bin
+        export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin
+        export PATH=$PATH:$HOME/android-sdk/platform-tools
         buildozer android debug
 
-    # 8️⃣ UPLOAD APK
+    # 9️⃣ UPLOAD APK
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
