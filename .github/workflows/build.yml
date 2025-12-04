@@ -7,46 +7,51 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
 
-    # 1️⃣ SYSTEM DEPS
-    - name: System Dependencies
+
+    # 1️⃣ SYSTEM DEPENDENCIES
+    - name: System Deps
       run: |
         sudo apt update
         sudo apt install -y \
-          zip unzip wget curl git \
+          zip unzip wget git \
           openjdk-17-jdk \
-          build-essential zlib1g-dev \
-          libffi-dev libssl-dev
+          build-essential zlib1g-dev libffi-dev libssl-dev
 
-    # 2️⃣ PYTHON
-    - name: Setup Python 3.9
+
+    # 2️⃣ PYTHON 3.9
+    - name: Python 3.9
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
+
     # 3️⃣ BUILDOZER
     - name: Install Buildozer
       run: |
-        python -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install buildozer cython setuptools==65.5.0
 
-    # 4️⃣ ✅ REAL ANDROID SDK (CORRECT LAYOUT)
-    - name: Install Android SDK (FINAL FIX)
+
+    # 4️⃣ ANDROID SDK (FINAL BOSS FIX)
+    - name: Install Android SDK (FINAL)
       run: |
-        mkdir -p $HOME/android-sdk/cmdline-tools
+        mkdir -p $HOME/android-sdk
         cd $HOME/android-sdk
 
-        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-        unzip commandlinetools-linux-11076708_latest.zip
+        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O tools.zip
+        unzip tools.zip
 
-        mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+        mkdir -p cmdline-tools/latest
+
+        mv cmdline-tools/* cmdline-tools/latest 2>/dev/null || true
+        mv latest cmdline-tools || true
 
         export ANDROID_HOME=$HOME/android-sdk
-        export ANDROID_SDK_ROOT=$HOME/android-sdk
         export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
 
         yes | sdkmanager --licenses
@@ -56,27 +61,30 @@ jobs:
           "platforms;android-30" \
           "build-tools;30.0.3"
 
-    # 5️⃣ ✅ KILL OLD SDKMANAGER BUG (PERMANENT)
-    - name: Legacy SDKMANAGER Symlink Fix
+
+    # 5️⃣ FAKE OLD SDKMANAGER PATH (KILL OLD BUG)
+    - name: Fake Old SDK Path
       run: |
         mkdir -p $HOME/android-sdk/tools/bin
         ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager \
               $HOME/android-sdk/tools/bin/sdkmanager
 
-    # 6️⃣ ✅ FORCE NDK 21b ONLY (NO AUTO DOWNLOAD)
-    - name: Install Android NDK r21b
+
+    # 6️⃣ MANUAL NDK 21b (LOCKED — NO NDK 25)
+    - name: Install Android NDK 21b
       run: |
         mkdir -p $HOME/.buildozer/android/platform
         cd $HOME/.buildozer/android/platform
-
         wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
         unzip -q android-ndk-r21b-linux-x86_64.zip
 
-    # 7️⃣ ✅ CLEAN BUILDOZER CACHE
-    - name: Clean Buildozer Cache
+
+    # 7️⃣ CLEAN CACHE
+    - name: Clean Cache
       run: rm -rf ~/.buildozer
 
-    # 8️⃣ ✅ BUILD APK
+
+    # 8️⃣ BUILD APK
     - name: Build APK
       env:
         ANDROID_HOME: $HOME/android-sdk
@@ -87,10 +95,10 @@ jobs:
         export PATH=$PATH:$HOME/android-sdk/tools/bin
         export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin
         export PATH=$PATH:$HOME/android-sdk/platform-tools
-
         buildozer android debug
 
-    # 9️⃣ ✅ UPLOAD APK
+
+    # 9️⃣ UPLOAD APK
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
