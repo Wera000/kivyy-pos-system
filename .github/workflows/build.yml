@@ -12,37 +12,42 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1️⃣ SYSTEM + JAVA 17 (FORCED)
-      - name: System Dependencies + Force Java 17
+      # ✅✅✅ FORCE JAVA 17 PROPERLY (THIS FIXES YOUR CRASH)
+      - name: Set up Java 17 (REAL FIX)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Verify Java
+        run: |
+          java -version
+          javac -version
+
+      # 2️⃣ SYSTEM
+      - name: System Dependencies
         run: |
           sudo apt update
           sudo apt install -y \
             git zip unzip wget \
-            openjdk-17-jdk \
             build-essential \
             zlib1g-dev \
             libffi-dev \
             libssl-dev
 
-          sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
-          sudo update-alternatives --set javac /usr/lib/jvm/java-17-openjdk-amd64/bin/javac
-
-          java -version
-          javac -version
-
-      # 2️⃣ PYTHON 3.9
-      - name: Set up Python 3.9
+      # 3️⃣ PYTHON
+      - name: Python 3.9
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
-      # 3️⃣ BUILDOZER
+      # 4️⃣ BUILDOZER
       - name: Install Buildozer
         run: |
           pip install --upgrade pip
           pip install buildozer cython setuptools==65.5.0
 
-      # 4️⃣ ANDROID SDK (REAL ONE)
+      # 5️⃣ ANDROID SDK
       - name: Install Android SDK
         run: |
           mkdir -p $HOME/android-sdk
@@ -64,14 +69,14 @@ jobs:
             "platforms;android-30" \
             "build-tools;30.0.3"
 
-      # 5️⃣ FIX OLD SDKMANAGER PATH (AIDL FIX)
-      - name: Fake old sdkmanager path
+      # 6️⃣ OLD SDKMANAGER PATH FIX (AIDL FIX)
+      - name: Fix old sdkmanager path
         run: |
           mkdir -p $HOME/android-sdk/tools/bin
           ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager \
                  $HOME/android-sdk/tools/bin/sdkmanager
 
-      # 6️⃣ NDK 25b ONLY (MANDATORY)
+      # 7️⃣ NDK 25b
       - name: Install Android NDK 25b
         run: |
           mkdir -p $HOME/.buildozer/android/platform
@@ -80,24 +85,23 @@ jobs:
           wget https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
           unzip -q android-ndk-r25b-linux.zip
 
-      # 7️⃣ FULL CLEAN
+      # 8️⃣ CLEAN
       - name: Clean Buildozer Cache
         run: rm -rf ~/.buildozer
 
-      # 8️⃣ BUILD APK
+      # 9️⃣ BUILD APK
       - name: Build APK
         env:
           ANDROID_HOME: $HOME/android-sdk
           ANDROID_SDK_ROOT: $HOME/android-sdk
           ANDROID_NDK_HOME: $HOME/.buildozer/android/platform/android-ndk-r25b
-          JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
         run: |
           export PATH=$PATH:$HOME/android-sdk/tools/bin
           export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin
           export PATH=$PATH:$HOME/android-sdk/platform-tools
           buildozer android debug --ndk-api=25
 
-      # 9️⃣ UPLOAD APK
+      # 🔟 UPLOAD APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
