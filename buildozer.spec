@@ -10,20 +10,15 @@ version = 0.1
 orientation = landscape
 fullscreen = 0
 
-# ✅ KEEP REQUIREMENTS SIMPLE (PY 3.9 COMES FROM YAML)
-requirements = python3,kivy
+requirements = python3==3.9,kivy
 
-# ✅ ANDROID SETTINGS (MATCH YAML)
 android.api = 30
 android.minapi = 21
-android.ndk = 21b
+
+# ✅ DO NOT FORCE OLD NDK
+# ❌ android.ndk = 21b  (REMOVED)
 
 android.sdk_path = /home/runner/android-sdk
-android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r21b
-android.sdkmanager_path = /home/runner/android-sdk/tools/bin/sdkmanager
-
-# ✅ THIS PREVENTS AIDL BUGS FOREVER
-p4a.broken_recipes = aidl
 
 [buildozer]
 log_level = 2
