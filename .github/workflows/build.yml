@@ -12,8 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1️⃣ SYSTEM
-      - name: System Dependencies
+      # 1️⃣ SYSTEM + JAVA 17 (FORCED)
+      - name: System Dependencies + Force Java 17
         run: |
           sudo apt update
           sudo apt install -y \
@@ -24,8 +24,14 @@ jobs:
             libffi-dev \
             libssl-dev
 
-      # 2️⃣ PYTHON
-      - name: Python 3.9
+          sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+          sudo update-alternatives --set javac /usr/lib/jvm/java-17-openjdk-amd64/bin/javac
+
+          java -version
+          javac -version
+
+      # 2️⃣ PYTHON 3.9
+      - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
@@ -58,7 +64,7 @@ jobs:
             "platforms;android-30" \
             "build-tools;30.0.3"
 
-      # 5️⃣ FIX OLD SDKMANAGER PATH (AIDL BUG KILL)
+      # 5️⃣ FIX OLD SDKMANAGER PATH (AIDL FIX)
       - name: Fake old sdkmanager path
         run: |
           mkdir -p $HOME/android-sdk/tools/bin
