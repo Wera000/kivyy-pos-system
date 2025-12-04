@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@v4
 
     # -----------------------------
-    # Install dependencies
+    # Install system dependencies
     # -----------------------------
     - name: Install System Dependencies
       run: |
@@ -27,7 +27,7 @@ jobs:
           libssl-dev
 
     # -----------------------------
-    # Python 3.9
+    # Setup Python 3.9
     # -----------------------------
     - name: Set up Python 3.9
       uses: actions/setup-python@v5
@@ -49,7 +49,7 @@ jobs:
 
         wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O tools.zip
         unzip -q tools.zip
-        rm -f tools.zip
+        rm tools.zip
 
         mkdir -p cmdline-tools/latest
         mv cmdline-tools/* cmdline-tools/latest/ || true
@@ -79,14 +79,13 @@ jobs:
         rm android-ndk-r25b-linux.zip
 
     # -----------------------------
-    # CLEAR BUILDOZER CACHE
+    # Clear Buildozer cache
     # -----------------------------
-    - name: Clear Buildozer Internal Cache
-      run: |
-        rm -rf ~/.buildozer
+    - name: Clear Buildozer Cache
+      run: rm -rf ~/.buildozer
 
     # -----------------------------
-    # BUILD APK
+    # Build APK
     # -----------------------------
     - name: Build APK
       env:
@@ -94,10 +93,7 @@ jobs:
         ANDROID_SDK_ROOT: $HOME/android-sdk
         ANDROID_NDK_HOME: $HOME/android-ndk/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-
-        # THE FIX THAT STOPS build-tools 36.x
         P4A_NO_ANDROID_PACKAGE_INSTALL: 1
-
       run: |
         export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
         export PATH=$PATH:$ANDROID_HOME/platform-tools
