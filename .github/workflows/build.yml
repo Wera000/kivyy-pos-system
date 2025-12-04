@@ -1,4 +1,4 @@
-name: Build Kivy APK
+name: Build Kivy APK (1-click)
 
 on:
   workflow_dispatch:
@@ -17,17 +17,17 @@ jobs:
         sudo apt update
         sudo apt install -y build-essential zip unzip openjdk-17-jdk wget libssl-dev libffi-dev zlib1g-dev
 
-    - name: Install Python 3.9
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
 
-    - name: Install Buildozer
+    - name: Install Buildozer & Python-for-Android
       run: |
         pip install --upgrade pip
-        pip install buildozer cython==0.29.36 python-for-android==2024.1.21 setuptools==65.5.0
+        pip install buildozer==1.5.0 cython==0.29.36 python-for-android==2024.1.21 setuptools==65.5.0
 
-    - name: Download Android SDK (manual, FIXES 36.1 BUG)
+    - name: Download Android SDK (force correct versions)
       run: |
         mkdir -p $HOME/android-sdk
         cd $HOME/android-sdk
@@ -39,11 +39,7 @@ jobs:
         export ANDROID_HOME=$HOME/android-sdk
         export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
         yes | sdkmanager --licenses
-
-        # FORCE ONLY THESE VERSIONS
-        sdkmanager "platform-tools"
-        sdkmanager "platforms;android-30"
-        sdkmanager "build-tools;30.0.3"
+        sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
 
     - name: Install NDK 25b
       run: |
@@ -52,6 +48,9 @@ jobs:
         wget https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
         unzip -q android-ndk-r25b-linux.zip
         rm android-ndk-r25b-linux.zip
+
+    - name: Clear Buildozer Cache
+      run: rm -rf ~/.buildozer
 
     - name: Build APK
       env:
