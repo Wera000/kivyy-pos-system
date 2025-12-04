@@ -14,12 +14,11 @@ requirements = python3==3.9,kivy
 
 android.api = 30
 android.minapi = 21
+android.ndk = 21b
 
 android.sdk_path = /home/runner/android-sdk
 android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r21b
-android.sdkmanager_path = /home/runner/android-sdk/cmdline-tools/latest/bin/sdkmanager
-
-#p4a.broken_recipes = aidl
+android.sdkmanager_path = /home/runner/android-sdk/tools/bin/sdkmanager
 
 [buildozer]
 log_level = 2
