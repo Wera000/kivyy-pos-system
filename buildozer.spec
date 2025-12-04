@@ -16,9 +16,10 @@ android.api = 30
 android.minapi = 21
 
 # Use new correct field
-android.archs = arm64-v8a, armeabi-v7a
+
 
 android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r25b
+android.archs = arm64-v8a, armeabi-v7a
 android.accept_sdk_license = True
 
 [buildozer]
