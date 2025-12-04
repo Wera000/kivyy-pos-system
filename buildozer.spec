@@ -10,18 +10,15 @@ version = 0.1
 orientation = landscape
 fullscreen = 0
 
-requirements = python3==3.9,kivy
+requirements = python3==3.10,kivy
 
 android.api = 30
 android.minapi = 21
 
-# ARCHS
-android.arch = arm64-v8a,armeabi-v7a
+# Use new correct field
+android.archs = arm64-v8a, armeabi-v7a
 
-# IMPORTANT FIX: Use external NDK path
 android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r25b
-
-# OPTIONAL: speeds up build a little
 android.accept_sdk_license = True
 
 [buildozer]
