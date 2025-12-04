@@ -87,14 +87,13 @@ jobs:
         ANDROID_SDK_ROOT: $HOME/android-sdk
         ANDROID_NDK_HOME: $HOME/android-ndk/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        P4A_NO_ANDROID_PACKAGE_INSTALL: 1
       run: |
         export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
         export PATH=$PATH:$ANDROID_HOME/platform-tools
 
-        # Prevent wrong build-tools auto-install
-        export P4A_NO_ANDROID_PACKAGE_INSTALL=1
-
         buildozer android debug
+
 
     # -----------------------------
     # Upload output APK
