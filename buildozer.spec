@@ -10,7 +10,7 @@ version = 0.1
 orientation = landscape
 fullscreen = 0
 
-requirements = python3==3.10,kivy
+requirements = python3==3.9,kivy
 
 android.api = 30
 android.minapi = 21
