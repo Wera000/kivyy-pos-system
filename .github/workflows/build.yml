@@ -10,74 +10,57 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install System Dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y \
-          zip unzip git wget \
-          openjdk-17-jdk \
-          build-essential \
-          zlib1g-dev \
-          libffi-dev \
-          libssl-dev \
-          python3-pip \
-          curl
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y zip unzip git wget openjdk-17-jdk build-essential zlib1g-dev libffi-dev libssl-dev
 
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.9"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
 
-    - name: Install Buildozer & Python-for-Android
-      run: |
-        pip install --upgrade pip
-        pip install buildozer==1.5.0 cython==0.29.36 python-for-android==2024.1.21 setuptools==65.5.0
+      - name: Install Buildozer & Python-for-Android
+        run: |
+          pip install --upgrade pip
+          pip install buildozer==1.5.0 cython==0.29.36 python-for-android==2024.1.21 setuptools==65.5.0
 
-    - name: Install Android SDK Command-line Tools
-      run: |
-        mkdir -p $HOME/android-sdk
-        cd $HOME/android-sdk
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-        unzip cmdline-tools.zip
-        mkdir -p cmdline-tools/latest
-        shopt -s extglob
-        mv cmdline-tools/!(latest) cmdline-tools/latest || true
-        export ANDROID_HOME=$HOME/android-sdk
-        export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+      - name: Install Android SDK Commandline Tools
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
+          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
 
-    - name: Install Android SDK Build Tools & Platforms
-      run: |
-        yes | sdkmanager --licenses
-        sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
+      - name: Install Android NDK 25b
+        run: |
+          mkdir -p $HOME/.buildozer/android/platform
+          cd $HOME/.buildozer/android/platform
+          wget https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
+          unzip -q android-ndk-r25b-linux.zip
 
-    - name: Install Android NDK 25b
-      run: |
-        mkdir -p $HOME/.buildozer/android/platform
-        cd $HOME/.buildozer/android/platform
-        wget https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
-        unzip -q android-ndk-r25b-linux.zip
+      - name: Clean Buildozer Cache
+        run: rm -rf ~/.buildozer
 
-    - name: Clean Buildozer Cache
-      run: |
-        rm -rf ~/.buildozer
+      - name: Build APK
+        env:
+          ANDROID_HOME: $HOME/android-sdk
+          ANDROID_SDK_ROOT: $HOME/android-sdk
+          ANDROID_NDK_HOME: $HOME/.buildozer/android/platform/android-ndk-r25b
+          JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+          PATH: $HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH
+        run: |
+          buildozer android clean
+          buildozer android debug --ndk-api=25
 
-    - name: Build APK
-      env:
-        ANDROID_HOME: $HOME/android-sdk
-        ANDROID_SDK_ROOT: $HOME/android-sdk
-        ANDROID_NDK_HOME: $HOME/.buildozer/android/platform/android-ndk-r25b
-        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-      run: |
-        export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin
-        export PATH=$PATH:$HOME/android-sdk/platform-tools
-        export PATH=$PATH:$HOME/android-sdk/tools/bin
-        buildozer android clean
-        buildozer android debug --ndk-api=25
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: My-Kivy-APK
-        path: bin/*.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: My-Kivy-APK
+          path: bin/*.apk
